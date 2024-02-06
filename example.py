@@ -19,9 +19,9 @@ Move = Union[None, Literal["pass"],Tuple[int, int]]
 
 class BaseConfig:
     def __init__(self) -> None:
-        self.katago_path:str = "katrain/KataGo/katago.exe"
-        self.config_path:str= "katrain/KataGo/analysis_example.cfg"
-        self.model_path:str = "katrain/models/kata1-b18c384nbt-s6582191360-d3422816034.bin.gz"
+        self.katago_path:str = "KataGo/katago.exe"
+        self.config_path:str= "KataGo/analysis_example.cfg"
+        self.model_path:str = "models/kata1-b18c384nbt-s6582191360-d3422816034.bin.gz"
         self.additional_args: List[str] = []
         self.komi : float = 6.5 # 贴目
         self.board:sgfmill.boards.Board = sgfmill.boards.Board(19) # 棋盘
@@ -92,6 +92,7 @@ class KataGO(BaseConfig):
         query["boardXSize"] = initial_board.side
         query["boardYSize"] = initial_board.side
         query["includePolicy"] = True
+        query['maxVisits']=20000
         if max_visits is not None:
             query["maxVisits"] = max_visits
         return self.query_raw(query)
@@ -126,7 +127,7 @@ class KataGO(BaseConfig):
     
 def main():
 
-    moves = [("b",(3,3)), ("w",(15,15))]
+    moves = [("b",(3,3)), ("w",(15,15))] #,("b",(16,16)),("w",(16,15)),("b",(15,16))]
     # 启动
     katago = KataGO(moves)
     # 分析一局棋盘
