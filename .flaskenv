@@ -1,0 +1,4 @@
+FLASK_APP=server
+FLASK_ENV=development
+SECRET_KEY=your_secret_key_here
+DATABASE_URI=your_database_uri_here
