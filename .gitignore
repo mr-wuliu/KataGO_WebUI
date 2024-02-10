@@ -4,5 +4,4 @@ output.json
 analysis_logs/
 /models
 tempCodeRunnerFile.py
-.flaskenv
 **/__pycache__
