@@ -12,11 +12,6 @@ Color = Union[Literal["b"],Literal["w"]]
 Move = Union[None, Literal["pass"],Tuple[int, int]]
 
 # 配置
-# config = {"katago_path":"katrain/KataGo/katago.exe",
-#           "type":"analysis",
-#           "config_path":"katrain/KataGo/analysis_example.cfg",
-#           "model_path":"katrain/models/kata1-b18c384nbt-s6582191360-d3422816034.bin.gz"}
-
 class BaseConfig:
     def __init__(self) -> None:
         self.katago_path:str = "KataGo/katago.exe"

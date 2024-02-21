@@ -4,13 +4,12 @@ import sgfmill.ascii_boards
 import sgfmill.boards
 from typing import Any, Union, Literal, Tuple, List, Dict
 import subprocess
-# 定义操作类型
+# 定义操作
 Color = Union[Literal['b'], Literal['w']]
 Move = Union[None, Literal['pass'],Tuple[int, int]]
 
 class BaseConfig:
-    def __inti__(self) -> None:
-        
+    def __init__(self) -> None:
         self.KATAGO_PATH = "KataGo/katago.exe"
         self.CONFIG_PATH = "KataGo/analysis_example.cfg"
         self.MODEL_PATH = "models/kata1-b18c384nbt-s6582191360-d3422816034.bin.gz"

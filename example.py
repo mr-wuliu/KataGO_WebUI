@@ -57,7 +57,7 @@ class KataGO(BaseConfig):
         self.stderrthread = Thread(target=printforever)
         self.stderrthread.start()
 
-
+    
     def displayboard(self, board):
         # 展示初始面板
         for color, move in self.moves:
