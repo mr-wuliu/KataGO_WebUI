@@ -92,7 +92,7 @@ class KataGO(BaseConfig):
         query["boardXSize"] = initial_board.side
         query["boardYSize"] = initial_board.side
         query["includePolicy"] = True
-        query['maxVisits']=20000
+        query['maxVisits']=200
         if max_visits is not None:
             query["maxVisits"] = max_visits
         return self.query_raw(query)
