@@ -3,3 +3,5 @@ output.json
 .history
 analysis_logs/
 /models
+tempCodeRunnerFile.py
+**/__pycache__
