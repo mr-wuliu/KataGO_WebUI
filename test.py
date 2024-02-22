@@ -1,10 +1,7 @@
 from sgfmill.ascii_boards import boards
-from typing import Any, Union, Literal, Tuple, List, Dict
 import sgfmill.ascii_boards
-import copy
-Color = Union[Literal["b"],Literal["w"]]
-Move = Union[None, Literal["pass"],Tuple[int, int]]
-
+from engine.config import Action, Move, Board, Color
+from typing import List
 def displayboard(board, moves):
     # 展示初始面板
     for color, move in moves:
@@ -13,31 +10,22 @@ def displayboard(board, moves):
             board.play(row, col, color)
     print(sgfmill.ascii_boards.render_board(board)) # ascii初始棋盘
 
-board: boards.Board = boards.Board(19) # 棋盘
-moves:List[Tuple[Color,Move]] = [('b',(1,1)),('w',(1,2)),('b',(1,3)),('w',(2,3)),('b',(2,2)),('w',(1,4)),('b',(0,2)),('w',(0,3)),('b',(15,15)),('w',(1,2)),('b',(1,3)),('w',(1,2)),('b',(1,3))]
-displayboard(board.copy(), moves)
 
-class test:
-    def __init__(self) -> None:
-        self.name = "hello"
-    def change(self, name):
-        self.name = name
-    def print(self):
-        print(self.name)
-
-a = test()
-a.print()
-a.change("two")
-a.print()
-b = copy.copy(a)
-b.change('b')
-b.print()
-a.print()
+from engine.game import BaseGame
 
 
-c = test()
-c.print()
-def change(some:test):
-    some.change("daw")
-change(c)
-c.print()
+if __name__ == '__main__':
+    go = BaseGame()
+    actions :List[Action] = [('b',(0,0)),('w',(1,0)),('b',(1,1)),('w',(0,1))]
+    actions2 :List[Action] = [('b',(3,3)),('w',(3,4)),('w',(4,3)),('w',(2,3)),('w',(3,2))]
+    for action in actions2:
+        go.play_move(action)
+    go.print_board()
+    print(go.get_sequence())
+    go.new_branch(('b',(15,15)))
+    for action in actions:
+        go.play_move(action)
+    go.print_board()
+    print(go.get_sequence())
+    
+    
