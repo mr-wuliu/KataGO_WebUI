@@ -1,65 +1,106 @@
 from __future__ import annotations
-from typing import Any, Union, Literal, Tuple, List, Dict
+from typing import Any, Union, Literal, Tuple, List, Dict, Optional
 from engine.config import Color, Move, Action, Board
 
 
 class GoNode:
-    def __init__(self,board, action: Action=None, parent: GoNode | None=None) -> None:
-        self.action = action
-        self.parent = parent
+    def __init__(self,board, parent: GoNode=None) -> None: # type: ignore
+        self.action : Action = None # 声明一个变量
+        self.parent :GoNode= parent
         self.children = []
         self.board: Board = board
         
     
     def add_child(self, action : Action, board: Board) :
-        child_node = GoNode(action=action,parent=self, board=board)
+        child_node = GoNode(parent=self, board=board)
+        child_node.action = action
+        child_node.add_action(action)
         self.children.append(child_node)
         return child_node
-    
+        
+    def add_action(self, action: Action):
+        self.action = action
+    def del_chile(self, index:int):
+        x: int = len(self.children)
+        if x <= index:
+            return False
+        del self.children[index]
+        
     def get_sequence(self):
         """
         获取当前分支行棋序列
         """
-        node, sequence = self, []
-        while node.action != "head":
+        node: GoNode= self
+        sequence = []
+        while node.action  is not None:
             sequence.append(node.action)
             node = node.parent
         return sequence[::-1] # 反转序列
     def get_parent(self) -> GoNode:
-        return self.parent # type: ignore
+        return self.parent
     
 
 class BaseGame:
     def __init__(self, board_size=19) -> None:
-        self.board_size:int = board_size
+        self.board_size = board_size
         self.move_tree:GoNode = GoNode(board=[[0 for _ in range(board_size)] for _ in range(board_size)])
         self.current_node : GoNode = self.move_tree
         self.current_color: int = 1 # 1 for black and 2 for white , start with black
 
-    def play_move(self, action: Action) -> bool:
+    def play_move(self, actions: Action | List[Action])->bool:
+        if isinstance(actions, list):
+            # 深拷贝当前的棋盘状态
+            temp_node = self.current_node
+            temp_board = [row[:] for row in self.current_node.board]
+            temp_color = self.current_color
+            success = True
+
+            for action in actions:
+                if not self._play_single_move(action):
+                    success = False
+                    break
+            if not success:
+                self.current_node = temp_node
+                self.current_color = temp_color
+                self.current_node.board = temp_board
+            return success
+        else:
+            self._play_single_move(actions)
+
+    def _play_single_move(self, action: Action) -> bool:
         '''
         action == ('b',(0,0)) 位于棋盘左下角
         '''
         # 落子判断
         if action == None: return False
+        assert action != 'head'
         if action[1] != "pass":
-            x, y = action[1] # type: ignore
+            x, y = action[1]
         # 合法性检查
         if not (0 <= x < self.board_size and 0 <= y < self.board_size):
             return False
         elif self.current_node.board[x][y] != 0 :
             return False
-        
-        # 提子
-        new_borard: Board = [row[:] for row in self.current_node.board] # copy the current board state
+        '''
+        打劫和提子
+        '''
+        # copy the current board state
+        new_borard: Board = [row[:] for row in self.current_node.board] 
         self.current_color = 1 if action[0]== 'b' else 2
-        new_borard[x][y] = self.current_color # action 颜色优先
+        new_borard[x][y] = self.current_color
         new_borard = self._capture_stones(x, y, new_borard)
+        last = self.current_node.parent
+        if last is not None and last.board == new_borard:
+                # 打劫
+                return False
+        if self.current_node.board == new_borard:
+            # 禁着点
+            return False
         new_node = self.current_node.add_child(action=action, board=new_borard)
         self.current_node = new_node
 
-        return True
-    
+        return True    
+
     def _capture_stones(self, x: int, y:int, board:Board)-> Board:
         """检查所有没提掉的子
         :param int x: _description_
@@ -126,12 +167,23 @@ class BaseGame:
         print("   ", "  ".join(column_labels), end='\n')  # 打印列标签
     
     def new_branch(self, action : Action)->bool:
+        """新建一个分支
+
+        :param Action action: 行为
+        :return bool: 是否新建成功
+        """
         if self.current_node.get_parent() == None:
             return False
         self.current_node = self.current_node.get_parent()
-        self.play_move(action)
+        self._play_single_move(action)
         return True
-
+    def show_branch(self) -> bool | List[GoNode]:
+        if self.current_node.parent is None:
+            return False
+        branch:List[GoNode] = self.current_node.parent.children
+        for node in branch:
+            print(node.action)
+        return True
         
     def switch_branch(self, index: int):
         # 切换分支
@@ -140,6 +192,21 @@ class BaseGame:
             self.current_color = 3 - self.current_color
         else :
             print("Invalid branch index")
-    
+    def del_current_branch(self):
+        if self.current_node.action == 'head' or self.current_node is None:
+            return False
+        partent = self.current_node.parent
+        del self.current_node
+        self.current_node = partent
+        
+
+    def print_tree(self, node: GoNode, depth=0):
+        # 打印当前节点的信息，可以根据需要调整输出的格式
+        if node.action is not None:
+            print('    ' * depth + str(node.action))
+        else:
+            print('    ' * depth + "Root")
+        for child in node.children:
+            self.print_tree(child, depth + 1)
     def _switch_player(self):
         self.current_color = 3 - self.current_color 
