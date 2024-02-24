@@ -16,3 +16,4 @@ Color = Union[Literal["b"],Literal["w"]]
 Move = Union[Literal["pass"],Tuple[int, int]]
 Action = Union[None, Literal["head"] ,Tuple[Color,Move]]
 Board = List[List[int]]
+

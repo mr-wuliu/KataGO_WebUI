@@ -7,20 +7,24 @@ class GoNode:
     def __init__(self,board, parent: GoNode=None) -> None: # type: ignore
         self.action : Action = None # 声明一个变量
         self.parent :GoNode= parent
-        self.children = []
+        self.branch_index: int = 0 # 棋子所属的分支序列. default == 0
+        self.children : List[GoNode] = []
         self.board: Board = board
-        
-    
-    def add_child(self, action : Action, board: Board) :
-        child_node = GoNode(parent=self, board=board)
-        child_node.action = action
-        child_node.add_action(action)
-        self.children.append(child_node)
-        return child_node
         
     def add_action(self, action: Action):
         self.action = action
-    def del_chile(self, index:int):
+
+    def add_child(self, action : Action, board: Board) :
+        child_node = GoNode(parent=self, board=board)
+        index = len(self.children)
+        child_node.action = action
+        child_node.branch_index = index
+        child_node.add_action(action)
+
+        self.children.append(child_node)
+        return child_node, index
+    
+    def del_child(self, index:int):
         x: int = len(self.children)
         if x <= index:
             return False
@@ -36,9 +40,9 @@ class GoNode:
             sequence.append(node.action)
             node = node.parent
         return sequence[::-1] # 反转序列
+    
     def get_parent(self) -> GoNode:
         return self.parent
-    
 
 class BaseGame:
     def __init__(self, board_size=19) -> None:
@@ -46,13 +50,17 @@ class BaseGame:
         self.move_tree:GoNode = GoNode(board=[[0 for _ in range(board_size)] for _ in range(board_size)])
         self.current_node : GoNode = self.move_tree
         self.current_color: int = 1 # 1 for black and 2 for white , start with black
+        self.main_branch : List[int] = []
+        self.current_branch  : List[int] = []
+        self.__is_main__ = True
 
     def play_move(self, actions: Action | List[Action])->bool:
         if isinstance(actions, list):
-            # 深拷贝当前的棋盘状态
+            # 深拷贝当前的棋局状态
             temp_node = self.current_node
             temp_board = [row[:] for row in self.current_node.board]
             temp_color = self.current_color
+            temp_branch = self.current_branch[:] # 深拷贝
             success = True
 
             for action in actions:
@@ -63,11 +71,12 @@ class BaseGame:
                 self.current_node = temp_node
                 self.current_color = temp_color
                 self.current_node.board = temp_board
+                self.current_branch = temp_branch
             return success
         else:
-            self._play_single_move(actions)
+            return self._play_single_move(actions)
 
-    def _play_single_move(self, action: Action) -> bool:
+    def _play_single_move(self, action: Action, is_current_branch: bool= True) -> bool:
         '''
         action == ('b',(0,0)) 位于棋盘左下角
         '''
@@ -96,7 +105,14 @@ class BaseGame:
         if self.current_node.board == new_borard:
             # 禁着点
             return False
-        new_node = self.current_node.add_child(action=action, board=new_borard)
+        # 更新状态
+        new_node, index = self.current_node.add_child(action=action, board=new_borard)
+        # 根据branch状态更新
+        if is_current_branch:
+            self.current_branch.append(index)
+        else :
+            del self.current_branch[-1]
+            self.current_branch.append(index)
         self.current_node = new_node
 
         return True    
@@ -150,6 +166,14 @@ class BaseGame:
     def get_sequence(self):
         return self.current_node.get_sequence()
     
+    def get_branch(self):
+        result : List[Action] = []
+        pr : GoNode = self.move_tree
+        for index in self.current_branch:
+            result.append(pr.children[index].action)
+            pr = pr.children[index]
+        return result
+    
     def print_board(self):
         column_labels = "ABCDEFGHJKLMNOPQRST"[:self.board_size]  # 跳过"I"
 
@@ -175,8 +199,10 @@ class BaseGame:
         if self.current_node.get_parent() == None:
             return False
         self.current_node = self.current_node.get_parent()
-        self._play_single_move(action)
+        self._play_single_move(action, False)
+
         return True
+    
     def show_branch(self) -> bool | List[GoNode]:
         if self.current_node.parent is None:
             return False
@@ -192,21 +218,25 @@ class BaseGame:
             self.current_color = 3 - self.current_color
         else :
             print("Invalid branch index")
+    
     def del_current_branch(self):
         if self.current_node.action == 'head' or self.current_node is None:
             return False
         partent = self.current_node.parent
         del self.current_node
         self.current_node = partent
-        
 
-    def print_tree(self, node: GoNode, depth=0):
+    def print_tree(self):
+        self._tree_recursion(self.move_tree)
+
+    def _tree_recursion(self, node: GoNode, depth=0):
         # 打印当前节点的信息，可以根据需要调整输出的格式
         if node.action is not None:
             print('    ' * depth + str(node.action))
         else:
             print('    ' * depth + "Root")
         for child in node.children:
-            self.print_tree(child, depth + 1)
+            self._tree_recursion(child, depth + 1)
+        
     def _switch_player(self):
         self.current_color = 3 - self.current_color 
