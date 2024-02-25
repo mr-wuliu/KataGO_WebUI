@@ -96,8 +96,18 @@ def test7():
     go.reback(len(base)-1)
     go.play_move(actions)
     go.reback(len(actions)-1)
-    print(go.play_move(actions2))
-    
+    go.play_move(actions2)
     go.print_tree()
+
+def test8():
+    go=BaseGame()
+    base: List[Action] = [('b',(0,0)),('w',(1,0)),('b',(1,1)),('w',(0,1)),('b',(2,0)),('w',(2,1))]
+    go.play_move(base)
+    go.reback(4)
+    print(go.current_index)
+    print(go.get_sequence())
+    go.move_next(4)
+    print(go.current_index)
+    print(go.get_sequence())
 if __name__ == '__main__':
-    test7()
+    test8()

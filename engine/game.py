@@ -57,6 +57,7 @@ class BaseGame:
         self.current_color: int = 1 # 1 for black and 2 for white , start with black
         self.main_branch : List[int] = []
         self.current_branch  : List[int] = []
+        self.current_index : int = 0 # 0 代表所处于头结点
         # 初始化
         self.current_node.action = 'head' # 头结点
 
@@ -84,13 +85,24 @@ class BaseGame:
         
     def reback(self, index : int)-> bool:
         copy : GoNode = self.current_node
+        if index >= self.current_index:
+            return False
         for i in range(index):
-            if self.current_node.action=='head':
-                self.current_node = copy
-                return False
             self.current_node = self.current_node.parent
+        self.current_index -= index
         return True
     
+    def move_next(self, num: int) ->bool:
+        if num + self.current_index > len(self.current_branch):
+            return False
+        for item in self.current_branch[self.current_index:self.current_index+num]:
+            self.current_node = self.current_node.children[item]
+
+        self.current_color = 1 if self.current_node.action[0]== 'b' else 2 # type: ignore
+        self.current_index += num
+
+        return True
+
     def get_sequence(self):
         return self.current_node.get_sequence()
     
@@ -171,6 +183,7 @@ class BaseGame:
             self.current_branch.append(item)
             self.current_color = 1 if action[0]== 'b' else 2
             self.current_node = self.current_node.parent.children[item]
+            self.current_index += 1
             return True
         # 如果不存在与子分支却又下过, 那么是非法的
         if self.current_node.board[x][y] != 0 :
@@ -199,10 +212,8 @@ class BaseGame:
         # 根据branch状态更新
 
         self.current_branch.append(index)
-        
-        # del self.current_branch[-1]
-        # self.current_branch.append(index)
         self.current_node = new_node
+        self.current_index += 1
 
         return True    
     
