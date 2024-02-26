@@ -8,7 +8,7 @@ class GoNode:
         self.action : Action = None # 声明一个变量
         self.parent :GoNode= parent
         self.branch_index: int = 0 # 棋子所属的分支序列. default == 0
-        self.node_id : int | None = None
+        self.node_id : int = 0
         self.children : List[GoNode] = []
         self.board: Board = board
         
@@ -20,7 +20,7 @@ class GoNode:
         index = len(self.children)
         child_node.action = action
         child_node.branch_index = index
-        child_node.node_id 
+        child_node.node_id = id
         child_node.add_action(action)
 
         self.children.append(child_node)
@@ -51,7 +51,6 @@ class GoNode:
         return []
     
 class BaseGame:
-
     def __init__(self, board_size=19) -> None:
         self.board_size = board_size
         self.move_tree:GoNode = GoNode(board=[[0 for _ in range(board_size)] for _ in range(board_size)])
@@ -62,7 +61,8 @@ class BaseGame:
         self.current_index : int = 0 # 0 代表所处于头结点
         # 初始化
         self.current_node.action = 'head' # 头结点
-        self.increment = 0
+        self.current_node.node_id = 0
+        self.increment = 1
 
     def play_move(self, actions: Action | List[Action])->bool:
         if isinstance(actions, list):
@@ -87,7 +87,6 @@ class BaseGame:
             return self.__play_single_move(actions)
         
     def reback(self, index : int)-> bool:
-        copy : GoNode = self.current_node
         if index >= self.current_index:
             return False
         for i in range(index):
@@ -149,9 +148,30 @@ class BaseGame:
         self.current_node = partent
     
     def toJSON(self):
-        # 将树转换为json格式
-        tree_dict = self.__tree_to_dict(self.move_tree)
-        return json.dumps(tree_dict, indent=4)
+        nodes = []
+        edges = []
+
+        def traverse(node: GoNode, parent_id=None):
+            node_dict = {
+                "id": node.node_id,
+                "action": node.action,
+                "branch_index": node.branch_index,
+            }
+            nodes.append(node_dict)
+
+            if parent_id is not None:
+                edges.append({"from": parent_id, "to": node.node_id, "branch_index": node.branch_index})
+
+            for child in node.children:
+                traverse(child, node.node_id)
+
+        traverse(self.move_tree)
+
+        graph = {
+            "nodes": nodes,
+            "edges": edges
+        }
+        return json.dumps(graph, indent=4)
 
     def print_board(self):
         column_labels = "ABCDEFGHJKLMNOPQRST"[:self.board_size]  # 跳过"I"
@@ -238,12 +258,10 @@ class BaseGame:
                 board = self.__remove_group(nx, ny, board)
         return board
 
-
     def __get_neighbors(self,x :int , y: int):
         """获取(x, y)位置的所有邻居（上下左右）。"""
         directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
         return [(x + dx, y + dy) for dx, dy in directions if 0 <= x + dx < self.board_size and 0 <= y + dy < self.board_size]
-    
     
     def __has_liberty(self, x: int, y:int,board: Board, visited):
         if (x,y) in visited: # prevent infinite recursion
@@ -281,14 +299,6 @@ class BaseGame:
             print('    ' * depth + "Root")
         for child in node.children:
             self.__tree_recursion(child, depth + 1)
-    
-    def __tree_to_dict(self, node : GoNode):
-        # # 递归构建字典
-        # node_dict = {
-        #     "action": node.action if node.action is not None  else "head",
-        #     "children":[ self.__tree_to_dict(child) for child in node.children]
-        # }
-        # return node_dict
         
     def __switch_player(self):
         self.current_color = 3 - self.current_color 

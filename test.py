@@ -98,6 +98,7 @@ def test7():
     go.reback(len(actions)-1)
     go.play_move(actions2)
     go.print_tree()
+    print(go.toJSON())
 
 def test8():
     go=BaseGame()
@@ -115,5 +116,38 @@ def test9():
     base: List[Action] = [('b',(0,0)),('w',(1,0)),('b',(1,1)),('w',(0,1)),('b',(2,0)),('w',(2,1))]
     go.play_move(base)
     print(go.toJSON())
+
+def testA():
+    go=BaseGame()
+    base: List[Action] = [('b',(0,0)),('w',(1,0)),('b',(1,1)),('w',(0,1)),('b',(2,0)),('w',(2,1))]
+    go.play_move(base)
+    print(go.toJSON())
+
+
+
+def testB():
+    import json
+    go=BaseGame()
+    base: List[Action] = [('b',(0,0)),('w',(1,0)),('b',(1,1)),('w',(0,1)),('b',(2,0)),('w',(2,1))]
+    actions : List[Action] = [('w',(14, 14)),('b',(15,15)),('w',(15,16))]
+    actions2 : List[Action] = [('w',(14,14)), ('b',(15,17)),('w',(15,4))]
+    go.play_move(base)
+    go.reback(len(base)-1)
+    go.play_move(actions)
+    go.reback(len(actions)-1)
+    go.play_move(actions2)
+    go.print_tree()
+    jsondata =go.toJSON()
+
+    def print_tree(data, parent_id=None, level=0):
+        # 找到所有当前父节点的直接子节点
+        children = [node for node in data["nodes"] if any(edge["from"] == parent_id and edge["to"] == node["id"] for edge in data["edges"])]
+        for child in children:
+            print('    ' * level + f"{child['action']} (Branch Index: {child['branch_index']})")
+            # 递归打印子节点
+            print_tree(data, parent_id=child["id"], level=level + 1)
+    data = json.loads(jsondata)
+    print_tree(data, parent_id=0)  # 假设根节点的ID为0
+
 if __name__ == '__main__':
-    test9()
+    testB()
