@@ -109,5 +109,11 @@ def test8():
     go.move_next(4)
     print(go.current_index)
     print(go.get_sequence())
+    
+def test9():
+    go=BaseGame()
+    base: List[Action] = [('b',(0,0)),('w',(1,0)),('b',(1,1)),('w',(0,1)),('b',(2,0)),('w',(2,1))]
+    go.play_move(base)
+    print(go.toJSON())
 if __name__ == '__main__':
-    test8()
+    test9()

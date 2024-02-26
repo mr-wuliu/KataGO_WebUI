@@ -1,24 +1,26 @@
 from __future__ import annotations
 from typing import Any, Union, Literal, Tuple, List, Dict, Optional
 from engine.config import Color, Move, Action, Board
-
+import json
 
 class GoNode:
     def __init__(self,board, parent: GoNode=None) -> None: # type: ignore
         self.action : Action = None # 声明一个变量
         self.parent :GoNode= parent
         self.branch_index: int = 0 # 棋子所属的分支序列. default == 0
+        self.node_id : int | None = None
         self.children : List[GoNode] = []
         self.board: Board = board
         
     def add_action(self, action: Action):
         self.action = action
 
-    def add_child(self, action : Action, board: Board) :
+    def add_child(self,id: int , action : Action, board: Board) :
         child_node = GoNode(parent=self, board=board)
         index = len(self.children)
         child_node.action = action
         child_node.branch_index = index
+        child_node.node_id 
         child_node.add_action(action)
 
         self.children.append(child_node)
@@ -60,6 +62,7 @@ class BaseGame:
         self.current_index : int = 0 # 0 代表所处于头结点
         # 初始化
         self.current_node.action = 'head' # 头结点
+        self.increment = 0
 
     def play_move(self, actions: Action | List[Action])->bool:
         if isinstance(actions, list):
@@ -144,6 +147,11 @@ class BaseGame:
         partent = self.current_node.parent
         del self.current_node
         self.current_node = partent
+    
+    def toJSON(self):
+        # 将树转换为json格式
+        tree_dict = self.__tree_to_dict(self.move_tree)
+        return json.dumps(tree_dict, indent=4)
 
     def print_board(self):
         column_labels = "ABCDEFGHJKLMNOPQRST"[:self.board_size]  # 跳过"I"
@@ -191,7 +199,6 @@ class BaseGame:
                 print(i.action)
             return False
 
-
         '''
         打劫和提子
         '''
@@ -202,13 +209,14 @@ class BaseGame:
         new_borard = self.__capture_stones(x, y, new_borard)
         last = self.current_node.parent
         if last is not None and last.board == new_borard:
-                # 打劫
-                return False
+            # 打劫
+            return False
         if self.current_node.board == new_borard:
             # 禁着点
             return False
         # 更新状态
-        new_node, index = self.current_node.add_child(action=action, board=new_borard)
+        new_node, index = self.current_node.add_child(self.increment, action=action, board=new_borard)
+        self.increment += 1
         # 根据branch状态更新
 
         self.current_branch.append(index)
@@ -274,5 +282,14 @@ class BaseGame:
         for child in node.children:
             self.__tree_recursion(child, depth + 1)
     
+    def __tree_to_dict(self, node : GoNode):
+        # # 递归构建字典
+        # node_dict = {
+        #     "action": node.action if node.action is not None  else "head",
+        #     "children":[ self.__tree_to_dict(child) for child in node.children]
+        # }
+        # return node_dict
+        
     def __switch_player(self):
         self.current_color = 3 - self.current_color 
+        
