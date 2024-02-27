@@ -1,6 +1,6 @@
 from __future__ import annotations
 from typing import Any, Union, Literal, Tuple, List, Dict, Optional
-from engine.config import Color, Move, Action, Board
+from extension.Go_engine.go_config import Color, Move, Action, Board
 import json
 
 class GoNode:

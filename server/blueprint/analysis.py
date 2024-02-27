@@ -1,6 +1,6 @@
 from flask import Blueprint, current_app
 from server.services.katago_service import KataGO
-import engine.core
+import extension.Go_engine.core
 bp = Blueprint('analysis',__name__)
 
 @bp.route('/')
