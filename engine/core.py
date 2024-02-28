@@ -3,11 +3,8 @@ from typing import Any, Union, Literal, Tuple, List, Dict
 from engine.config import BaseConfig
 import subprocess
 from engine.game import GoNode
-# 定义操作
-Color = Union[Literal['b'], Literal['w']]
-Move = Union[None, Literal['pass'], Tuple[int, int]]
-
-
+from typing import Any, Union, Literal, Tuple, List, Dict, Optional
+from engine.config import Color, Move, Action, Board
 
 class katago(BaseConfig):
     def __init__(self) -> None:
@@ -24,14 +21,9 @@ class katago(BaseConfig):
              stdout=subprocess.PIPE,
              stderr=subprocess.PIPE,
         )
-        self.moves = GoNode()
-    
-    def close(self):
-        self.katago.stdin.close()
-    def move(self, move: Tuple[Color,Move]) -> None:
-        self.moves.add_child(move)
-    def get_sequence(self):
-        return self.moves.get_sequence()
+        
+    def query():
+        
     
 
 

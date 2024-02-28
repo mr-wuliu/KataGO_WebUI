@@ -59,6 +59,8 @@ class BaseGame:
         self.main_branch : List[int] = []
         self.current_branch  : List[int] = []
         self.current_index : int = 0 # 0 代表所处于头结点
+        self.komi = 6.5
+        self.rule = 'chinese'
         # 初始化
         self.current_node.action = 'head' # 头结点
         self.current_node.node_id = 0

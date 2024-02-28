@@ -13,19 +13,6 @@ def displayboard(board, moves):
 
 from engine.game import BaseGame
 
-def test1():
-    go = BaseGame()
-    actions :List[Action] = [('b',(0,0)),('w',(1,0)),('b',(1,1)),('w',(0,1))]
-    actions2 :List[Action] = [('b',(3,3)),('w',(3,4)),('w',(4,3)),('w',(2,3)),('w',(3,2))]
-    for action in actions2:
-        go.__play_single_move(action)
-    go.print_board()
-    print(go.get_sequence())
-    go.new_branch(('b',(15,15)))
-    for action in actions:
-        go.__play_single_move(action)
-    go.print_board()
-    print(go.get_sequence())
     
 def test2():
     go = BaseGame()
@@ -148,6 +135,7 @@ def testB():
             print_tree(data, parent_id=child["id"], level=level + 1)
     data = json.loads(jsondata)
     print_tree(data, parent_id=0)  # 假设根节点的ID为0
+    
 
 if __name__ == '__main__':
-    testB()
+    test2()
