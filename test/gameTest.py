@@ -1,6 +1,13 @@
+import sys
+import os
+
+# 添加父目录到sys.path
+parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(parent_dir)
+
 from sgfmill.ascii_boards import boards
 import sgfmill.ascii_boards
-from engine.config import Action, Move, Board, Color
+from extension.Go_engine.go_config import Action, Move, Board, Color
 from typing import List
 def displayboard(board, moves):
     # 展示初始面板
@@ -11,7 +18,7 @@ def displayboard(board, moves):
     print(sgfmill.ascii_boards.render_board(board)) # ascii初始棋盘
 
 
-from engine.game import BaseGame
+from extension.Go_engine.game import BaseGame
 
     
 def test2():
@@ -138,4 +145,8 @@ def testB():
     
 
 if __name__ == '__main__':
+<<<<<<< HEAD:test.py
     test2()
+=======
+    testA()
+>>>>>>> a1736f79c9f51cccdf73d123eb1a843ab147378a:test/gameTest.py
