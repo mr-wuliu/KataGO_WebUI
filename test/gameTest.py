@@ -143,10 +143,16 @@ def testB():
     data = json.loads(jsondata)
     print_tree(data, parent_id=0)  # 假设根节点的ID为0
     
+def testC():
+    import json
+    go=BaseGame()
+    base: List[Action] = [('b',(0,0)),('w',(1,0)),('b',(1,1)),('w',(0,1)),('b',(2,0)),('w',(2,1))]
+    actions : List[Action] = [('w',(14, 14)),('b',(15,15)),('w',(15,16))]
+    actions2 : List[Action] = [('w',(14,14)), ('b',(15,17)),('w',(15,4))]
+    go.play_move(base)
+    go.print_tree()
+    goB = go.toJSON()
+    print(goB)
 
 if __name__ == '__main__':
-<<<<<<< HEAD:test.py
-    test2()
-=======
-    testA()
->>>>>>> a1736f79c9f51cccdf73d123eb1a843ab147378a:test/gameTest.py
+    testC()

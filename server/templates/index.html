@@ -1,0 +1,43 @@
+{% extends './common/base.html' %}
+
+{% block main%}
+
+<body>
+    <div class="container">
+        <h1>Welcome to Go Game</h1>
+        <div class="game-info">
+            <h2>About Go Game</h2>
+            <p>Go is a classic board game originated from China. It is played by two players who take turns placing
+                black and white stones on a grid board.</p>
+            <p>It is known for its simple rules yet deep strategic complexity, making it one of the most challenging and
+                rewarding board games ever created.</p>
+            {# <a href="/play" class="game-link">Play Go Game</a> #}
+            <button id="play-button" class="game-link">Play Go Game</button>
+            <a href="{{ url_for('auth.logout') }}" class="game-link">登出</a></li>
+        </div>
+    </div>
+    <div id="form-popup" class="form-popup">
+        <form action="{{ url_for('home.create') }}" method="post">
+            <label for="filename">Filename:</label>
+            <input type="text" id="filename" name="filename" required>
+            <label for="boardsize">Board Size:</label>
+            <input type="number" id="boardsize" name="boardsize" required>
+            <input type="submit" value="Create">
+        </form>
+    </div>
+    <script>
+        // 当页面加载完成后执行
+        document.addEventListener('DOMContentLoaded', function () {
+            // 获取按钮和表单弹出框
+            var playButton = document.getElementById('play-button');
+            var formPopup = document.getElementById('form-popup');
+
+            // 当按钮被点击时显示表单弹出框
+            playButton.addEventListener('click', function () {
+                formPopup.style.display = 'block';
+            });
+        });
+    </script>
+
+</body>
+{% endblock%}

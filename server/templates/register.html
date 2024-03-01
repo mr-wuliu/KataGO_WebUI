@@ -1,0 +1,45 @@
+{% extends './common/base.html' %}
+
+{% block main%}
+<body>
+    <div class="container">
+        <h1>Register</h1>
+        <form method="post">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required>
+            {% if form.errors.username %}
+            <div class="error-message">{{ form.errors.username[0] }}</div>
+            {% endif %}
+
+            <label for="email">Email Address:</label>
+            <input type="email" id="email" name="email" required>
+            {% if form.errors.email %}
+            <div class="error-message">{{ form.errors.email[0] }}</div>
+            {% endif %}
+
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+            {% if form.errors.password %}
+            <div class="error-message">{{ form.errors.password[0] }}</div>
+            {% endif %}
+
+            <label for="confirm">Confirm Password:</label>
+            <input type="password" id="confirm" name="confirm" required>
+            {% if form.errors.confirm %}
+            <div class="error-message">{{ form.errors.confirm[0] }}</div>
+            {% endif %}
+
+            <label class="tos">
+                <input type="checkbox" id="accept_tos" name="accept_tos" required>
+                I accept the Terms of Service
+            </label>
+            {% if form.errors.accept_tos %}
+            <div class="error-message">{{ form.errors.accept_tos[0] }}</div>
+            {% endif %}
+
+            <input type="submit" value="Register">
+        </form>
+    </div>
+</body>
+
+{% endblock%}

@@ -58,7 +58,7 @@ class BaseGame:
         self.current_color: int = 1 # 1 for black and 2 for white , start with black
         self.main_branch : List[int] = []
         self.current_branch  : List[int] = []
-        self.current_index : int = 0 # 0 代表所处于头结点
+        self.current_index : int = 0 # 0 代表所处于头结点, 用于表示分支位置
         self.komi = 6.5
         self.rule = 'chinese'
         # 初始化
@@ -171,7 +171,15 @@ class BaseGame:
 
         graph = {
             "nodes": nodes,
-            "edges": edges
+            "edges": edges,
+            "board_size": self.board_size,
+            "current_node" : self.current_node.node_id,
+            "komi": self.komi,
+            "rule": self.rule,
+            "increment": self.increment,
+            "current_branch": self.current_branch,
+            "current_index": self.current_index,
+            "color":self.current_color,
         }
         return json.dumps(graph, indent=4)
 
@@ -217,8 +225,6 @@ class BaseGame:
             return True
         # 如果不存在与子分支却又下过, 那么是非法的
         if self.current_node.board[x][y] != 0 :
-            for i in self.current_node.children:
-                print(i.action)
             return False
 
         '''

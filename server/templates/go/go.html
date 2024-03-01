@@ -1,0 +1,57 @@
+{% extends './common/base.html' %}
+
+{% block main %}
+<body>
+    <button id="moveButton">MOVE</button>
+    <button id="getBoardButton">Get Board</button>
+
+    <script>
+        // 获取按钮和其他元素
+        const moveButton = document.getElementById('moveButton');
+        const getBoardButton = document.getElementById('getBoardButton');
+
+        // 点击MOVE按钮时执行的函数
+        moveButton.addEventListener('click', async () => {
+            const action = ['b', [0, 0]];  // 表示 ('b', (0, 0)) 的Action格式数据
+            try {
+                const response = await fetch('/asy/action', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ action: action })
+                });
+                if (response.ok) {
+                    console.log('Action sent successfully!');
+                } else {
+                    console.error('Failed to send action.');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        });
+
+        // 点击Get Board按钮时执行的函数
+        getBoardButton.addEventListener('click', async () => {
+            try {
+                const response = await fetch('/asy/board', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                if (response.ok) {
+                    const boardData = await response.json();
+                    console.log('Board data:', boardData);
+                    // 这里可以处理获取到的棋盘数据
+                } else {
+                    console.error('Failed to get board data.');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        });
+    </script>
+</body>
+
+{% endblock%}
