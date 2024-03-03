@@ -49,7 +49,13 @@ class GoNode:
         if self.parent is not None:
             return self.parent.children
         return []
+    def add_children(self, nodes: List[GoNode]):
+        for node in nodes:
+            self.children.append(node)
+        return True
     
+
+
 class BaseGame:
     def __init__(self, board_size=19) -> None:
         self.board_size = board_size
@@ -149,39 +155,7 @@ class BaseGame:
         del self.current_node
         self.current_node = partent
     
-    def toJSON(self):
-        nodes = []
-        edges = []
-
-        def traverse(node: GoNode, parent_id=None):
-            node_dict = {
-                "id": node.node_id,
-                "action": node.action,
-                "branch_index": node.branch_index,
-            }
-            nodes.append(node_dict)
-
-            if parent_id is not None:
-                edges.append({"from": parent_id, "to": node.node_id, "branch_index": node.branch_index})
-
-            for child in node.children:
-                traverse(child, node.node_id)
-
-        traverse(self.move_tree)
-
-        graph = {
-            "nodes": nodes,
-            "edges": edges,
-            "board_size": self.board_size,
-            "current_node" : self.current_node.node_id,
-            "komi": self.komi,
-            "rule": self.rule,
-            "increment": self.increment,
-            "current_branch": self.current_branch,
-            "current_index": self.current_index,
-            "color":self.current_color,
-        }
-        return json.dumps(graph, indent=4)
+    
 
     def print_board(self):
         column_labels = "ABCDEFGHJKLMNOPQRST"[:self.board_size]  # 跳过"I"
@@ -201,6 +175,98 @@ class BaseGame:
 
     def print_tree(self):
         self.__tree_recursion(self.move_tree)
+
+    def toJSON(self):
+        nodes = []
+        edges = []
+
+        def traverse(node: GoNode, parent_id=None):
+            node_dict = {
+                "id": node.node_id,
+                "action": node.action,
+                "branch_index": node.branch_index,
+                "board": node.board,
+                # "board": "### ",
+            }
+            nodes.append(node_dict)
+
+            if parent_id is not None:
+                edges.append({ "from": parent_id,
+                               "to": node.node_id, })
+
+            for child in node.children:
+                traverse(child, node.node_id)
+
+        traverse(self.move_tree)
+        # 对nodes排序方便操作
+        nodes.sort(key=lambda x : x['id'])
+
+        graph = {
+            "nodes": nodes,
+            "edges": edges,
+            "board_size": self.board_size,
+            "current_node" : self.current_node.node_id,
+            "komi": self.komi,
+            "rule": self.rule,
+            "increment": self.increment,
+            "current_branch": self.current_branch,
+            "current_index": self.current_index, 
+            "color":self.current_color,
+        }
+        return json.dumps(graph, indent=4)
+    
+    @classmethod
+    def from_json(cls, json_data):
+        data = json.loads(json_data)
+
+        # 创建 BaseGame 实例
+        game = cls(board_size=data['board_size'])
+        game.komi = data['komi']
+        game.rule = data['rule']
+        game.increment = data['increment']
+        game.current_branch = data['current_branch']
+        game.current_index = data['current_index']
+        game.current_color = data['color']
+        game.board_size = data['board_size']
+        current_node_id = data['current_node']
+
+        # 需要从边和点构建出整个BaseGame()
+        nodes = data['nodes']
+        edges = data['edges']
+    
+        # 采用递归的方法构造
+        def travalMain():
+            root = GoNode(board=[[0 for _ in range(data['board_size'])] for _ in range(data['board_size'])])
+            root.action = 'head'
+            traval(root)
+            if current_node_id == 0:
+                game.current_node = root
+            return root
+        
+        def traval(parent: GoNode):
+            children : List[GoNode] = []
+            for edge in edges:
+                if edge['from'] == parent.node_id:
+                    node_info = nodes[edge['to']]
+                    temp_node = GoNode(node_info['board'])
+                    temp_node.node_id = edge['to']
+                    temp_node.parent = parent
+                    color=  node_info['action'][0]
+                    move = tuple(node_info['action'][1])
+                    temp_node.action = (color, move)
+                    temp_node.branch_index = node_info['branch_index']
+                    
+                    children.append(temp_node)
+            children.sort(key= lambda x : x.branch_index)
+            parent.add_children(children)
+            for i in children:
+                if i.node_id == current_node_id:
+                    game.current_node = i
+                traval(i)
+        temp = travalMain()
+        game.move_tree = temp
+
+        return game
 
     def __play_single_move(self, action: Action) -> bool:
         '''

@@ -150,9 +150,32 @@ def testC():
     actions : List[Action] = [('w',(14, 14)),('b',(15,15)),('w',(15,16))]
     actions2 : List[Action] = [('w',(14,14)), ('b',(15,17)),('w',(15,4))]
     go.play_move(base)
+    go.reback(4)
+    go.play_move(actions)
+    
     go.print_tree()
-    goB = go.toJSON()
-    print(goB)
+    # go.print_board()
 
+    goB = go.toJSON()
+    # 从 json 构建对象
+    game = BaseGame.from_json(goB)
+
+
+    game.print_tree()
+    game.print_board()
+
+    print(go.current_branch)
+    print(game.current_branch)
+    print(go.current_color)
+    print(game.current_color)
+    print(go.current_node.action)
+    print(game.current_node.action)
+
+    go.reback(len(actions))
+    go.play_move(actions2)
+    game.reback(len(actions))
+    game.play_move(actions2)
+    go.print_tree()
+    game.print_tree()
 if __name__ == '__main__':
     testC()

@@ -18,6 +18,14 @@ class NewBoard(FlaskForm):
 
 bp = Blueprint('analysis',__name__, url_prefix='/asy')
 
+# 定义一个函数，用于设置 g 对象的值
+def set_global_Game(var):
+    g.var = var
+
+# 定义一个函数，用于获取 g 对象的值
+def get_global_var():
+    return g.var
+
 @bp.route('/')
 def home():
     return render_template('go/go.html')
