@@ -71,6 +71,10 @@ class BaseGame:
         self.current_node.action = 'head' # 头结点
         self.current_node.node_id = 0
         self.increment = 1
+        self.white_name : str | None= ''
+        self.black_name : str | None= ''
+        self.game_name : str | None = ''
+
 
     def play_move(self, actions: Action | List[Action])->bool:
         if isinstance(actions, list):
@@ -212,6 +216,9 @@ class BaseGame:
             "current_branch": self.current_branch,
             "current_index": self.current_index, 
             "color":self.current_color,
+            'whiet':self.white_name,
+            'black':self.black_name,
+            'game_name':self.game_name,
         }
         return json.dumps(graph, indent=4)
     

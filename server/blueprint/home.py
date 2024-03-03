@@ -16,7 +16,9 @@ from extension import BaseGame
 from extension import Action, Move, Color
 
 class NewBoard(FlaskForm):
-    filename = StringField("filename", [validators.DataRequired()])
+    Game_Name = StringField("Game Name",[validators.DataRequired()])
+    white_player = StringField("White Player")
+    blakc_player = StringField("Black Player")
     boardsize = IntegerField("board size")
 
 
@@ -36,8 +38,13 @@ def create():
     form = NewBoard(request.form)
     if request.method == 'POST':
         if form.boardsize.data is not None:
-            session['filename'] = form.filename.data
-            session['go'] = BaseGame()
+            session['gamename'] = form.Game_Name.data
+            game = BaseGame()
+            game.black_name = form.blakc_player.data
+            game.white_name = form.white_player.data
+            
+            session['go'] = BaseGame().toJSON()
+
 
         return jsonify({"msg":"create board successsfuly"}), 201
     else:
