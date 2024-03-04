@@ -37,6 +37,11 @@ def sample():
 
 @bp.route('/show',methods=['GET','POST'])
 def show():
+    """输入对局名称, 在数据库中搜索对应的对局, 插入到html中返回
+    给前端
+
+    :return _type_: _description_
+    """
     return render_template('go/go.html')
 
 
