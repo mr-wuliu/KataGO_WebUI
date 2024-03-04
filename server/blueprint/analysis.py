@@ -5,16 +5,14 @@ from flask import (
 from server.services.katago_service import KataGO
 from flask_login import login_required
 from extension import BaseGame, Action, Board
-from extension import User
 from flask_wtf import FlaskForm
 from wtforms import StringField, IntegerField
 from wtforms import validators
-from extension import db
+from extension import db, GoHist, User
 from extension import BaseGame
 
-class NewBoard(FlaskForm):
-    filename = StringField("filename", [validators.DataRequired()])
-    boardsize = IntegerField("board size")
+class LoadBoard(FlaskForm):
+    id = IntegerField("id",[validators.DataRequired()])
 
 bp = Blueprint('analysis',__name__, url_prefix='/asy')
 
@@ -42,8 +40,17 @@ def show():
 
     :return _type_: _description_
     """
-    return render_template('go/go.html')
-
+    load_form = LoadBoard(request.form)
+    if request.method == 'POST' and load_form.validate():
+        game_id = load_form.id.data
+        game = GoHist.query.get(game_id)
+        if game:
+            return render_template('go/go.html', game_date=game.game_date)
+        else :
+            # 如果未找到对应的对局，返回错误消息
+            return render_template('error.html', message='Game not found')
+    # 如果是GET请求或表单验证失败，返回带有表单的模板
+    return render_template('go/show.html', form=load_form)
 
 @bp.route('/action',methods=['POST'])
 @login_required
