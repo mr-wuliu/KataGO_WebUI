@@ -17,11 +17,15 @@
         </div>
     </div>
     <div id="form-popup" class="form-popup">
+        <button id="close-button" class="close-button">Close</button>
         <form action="{{ url_for('home.create') }}" method="post">
-            <label for="filename">Filename:</label>
-            <input type="text" id="filename" name="filename" required>
-            <label for="boardsize">Board Size:</label>
-            <input type="number" id="boardsize" name="boardsize" required>
+
+            <label for="game_name">Game Name:</label>
+            <input type="text" id="game_name" name="game_name" required>
+            <label for="white_player">White Player:</label>
+            <input type="text" id="white_player" name="white_player">
+            <label for="black_player">Black Player:</label>
+            <input type="text" id="black_player" name="black_player">
             <input type="submit" value="Create">
         </form>
     </div>
@@ -30,12 +34,17 @@
         document.addEventListener('DOMContentLoaded', function () {
             // 获取按钮和表单弹出框
             var playButton = document.getElementById('play-button');
+            var closeButton = document.getElementById('close-button');
             var formPopup = document.getElementById('form-popup');
 
             // 当按钮被点击时显示表单弹出框
             playButton.addEventListener('click', function () {
                 formPopup.style.display = 'block';
             });
+            closeButton.addEventListener('click', function () {
+                formPopup.style.display = 'none';
+            });
+
         });
     </script>
 

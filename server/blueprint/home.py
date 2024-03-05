@@ -15,7 +15,7 @@ from extension import Action, Move, Color
 class NewBoard(FlaskForm):
     game_name = StringField("Game Name",[validators.DataRequired()])
     white_player = StringField("White Player")
-    blakc_player = StringField("Black Player")
+    black_player = StringField("Black Player")
 
 
 
@@ -34,18 +34,32 @@ def create():
     form = NewBoard(request.form)
     if request.method == 'POST':
         game = BaseGame()
-        game.black_name = form.blakc_player.data
+        game.game_name =form.game_name.data
+        game.black_name = form.black_player.data
         game.white_name = form.white_player.data
         game.komi = 6.5
         game.rule = 'chinese'
-        
-        go_hist = GoHist(user=current_user, game_data=game.toJSON())
+        print("$$$$$$$$$$")
+        print(form.game_name.data)
+        print(form.blakc_player.data)
+        print(form.white_player.data)
+        go_hist = GoHist(user=current_user,
+                        game_name=game.game_name,
+                        game_data=game.toJSON())
         db.session.add(go_hist)
         db.session.commit()
-
-
         return jsonify({"msg":"create board successsfuly"}), 201
     else:
         return jsonify({"msg":"Methods is illagle"}), 502
 
 
+@bp.route('/hist_play', methods=['POST', 'GET'])
+@login_required
+def hist_play():
+    if request.method == 'GET':
+        user_games = GoHist.query.filter_by(user_id=current_user.id).all()
+        game_info = [{'id': game.id, 'name': game.game_name} for game in user_games]
+        return jsonify(game_info)
+    else:
+        return jsonify('ERROR METHODS'), 501
+    

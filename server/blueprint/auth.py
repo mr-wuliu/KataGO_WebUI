@@ -28,8 +28,9 @@ class LoginForm(FlaskForm):
 @bp.route('/register', methods=['GET','POST'])
 def register():
     form = RegistrationForm(request.form)
-    if request.method == 'POST' and form.validate():
-        user = User(username=form.username.data, password=form.email.data)
+    if request.method == 'POST':
+        user = User(username=form.username.data,
+                    email=form.email.data)
         user.password = form.password.data
         if User.query.filter_by(username=form.username.data).first():
             return 'User {} is already registered.'.format(form.username.data)
@@ -54,12 +55,12 @@ def login():
 
         if not username or not password:
             flash('Invalid input.')
-            return redirect(url_for('user'))
+            return redirect(url_for('auth.login'))
 
         user = User.query.first()
         # 验证用户名和密码是否一致
         if user is None:
-            return redirect(url_for('login'))         
+            return redirect(url_for('auth.login'))         
         if username == user.username and user.verify_password(password):
             login_user(user)  # 登入用户
             flash('Login success.')

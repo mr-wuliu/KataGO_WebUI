@@ -29,10 +29,11 @@ class User(db.Model, UserMixin):
     
 
 class GoHist(db.Model):
+    # TODO: 对局时间等信息
     __tablename__ = 'go_hist'
     id = db.Column(db.Integer, primary_key=True)
     game_name = db.Column(db.String(64),nullable=False) # 对局可以重名, 根据id查找
-    game_data = db.Column(db.Text, nulla1ble=False)
+    game_data = db.Column(db.Text, nullable=False)
     # Other fields for GoHist
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     user = db.relationship("User", back_populates="go_hists")

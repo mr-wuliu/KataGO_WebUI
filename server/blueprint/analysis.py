@@ -50,13 +50,12 @@ def show():
             # 如果未找到对应的对局，返回错误消息
             return render_template('error.html', message='Game not found')
     # 如果是GET请求或表单验证失败，返回带有表单的模板
-    return render_template('go/show.html', form=load_form)
+    return render_template('go/go.html', form=load_form)
 
 @bp.route('/action',methods=['POST'])
 @login_required
 def doaction():
     if request.method == 'POST':
-        print('ACTIONACTION')
         go : BaseGame = g.go
         action_data = request.json
         assert action_data is not None
