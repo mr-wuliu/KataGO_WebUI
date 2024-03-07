@@ -3,7 +3,7 @@ from flask_migrate import Migrate
 from flask_login import UserMixin, login_manager
 
 from werkzeug.security import generate_password_hash, check_password_hash
-
+import datetime
 db = SQLAlchemy()
 migrate = Migrate()
 
@@ -32,6 +32,8 @@ class GoHist(db.Model):
     # TODO: 对局时间等信息
     __tablename__ = 'go_hist'
     id = db.Column(db.Integer, primary_key=True)
+    create_at = db.Column(db.DateTime, default=datetime.datetime.now)
+    play_datetime = db.Column(db.DateTime)
     game_name = db.Column(db.String(64),nullable=False) # 对局可以重名, 根据id查找
     game_data = db.Column(db.Text, nullable=False)
     # Other fields for GoHist

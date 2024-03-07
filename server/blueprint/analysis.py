@@ -73,6 +73,6 @@ def getBoard():
     if request.method == 'GET':
         go : BaseGame = session['go']
         print(go.print_tree)
-        return go.getJSONdate()
+        return go.toJSON()
     else:
         return jsonify({'msg': 'ERROR method'}), 501
