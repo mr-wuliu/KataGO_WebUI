@@ -27,6 +27,34 @@ def home():
     """主页面"""
     return render_template('index.html')
 
+@bp.route('/hist_show', methods=['GET'])
+@login_required
+def hist_show():
+    # 获取分页参数
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 10, type=int)  # 每页显示的记录数
+
+    # 实现分页查询，按对局创建时间降序排列
+    pagination = GoHist.query.order_by(GoHist.create_at.desc()).paginate(page=page,
+                                                                          per_page=per_page, error_out=False)
+    go_hists = pagination.items
+
+    # 将对局记录转换为字典列表
+    go_hists_data = [{
+        'id': hist.id,
+        'create_at': hist.create_at.isoformat(),  # 转换为ISO格式字符串
+        'play_datetime': hist.play_datetime.isoformat() if hist.play_datetime else None,
+        'game_name': hist.game_name,
+        'game_data': hist.game_data,
+        'user_id': hist.user_id
+    } for hist in go_hists]
+
+    return jsonify(go_hists_data)
+
+
+    # 返回分页对象和对局记录到模板，用于显示
+    return jsonify(go_hists)
+    return render_template('hist_show.html', pagination=pagination, go_hists=go_hists)
 
 @bp.route('/create',methods=['GET','POST'])
 @login_required

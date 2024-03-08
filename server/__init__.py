@@ -1,4 +1,5 @@
-from flask import Flask
+from flask import Flask, redirect, url_for
+
 from server.blueprint import test, analysis, auth, home
 from extension.Go_engine.core import katago
 from extension import db, migrate, login_manager
@@ -23,6 +24,9 @@ def register_blueprint(app: Flask) ->None:
     app.register_blueprint(auth.bp)
     app.register_blueprint(analysis.bp)
     app.register_blueprint(home.bp)
+    @app.route('/')
+    def index():
+        return redirect(url_for('home.home'))
 
 def register_database(app : Flask) -> None:
     db.init_app(app)
