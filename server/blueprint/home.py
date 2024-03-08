@@ -41,7 +41,7 @@ def create():
         game.rule = 'chinese'
         print("$$$$$$$$$$")
         print(form.game_name.data)
-        print(form.blakc_player.data)
+        print(form.black_player.data)
         print(form.white_player.data)
         go_hist = GoHist(user=current_user,
                         game_name=game.game_name,
@@ -56,10 +56,14 @@ def create():
 @bp.route('/hist_play', methods=['POST', 'GET'])
 @login_required
 def hist_play():
+    page = request.args.get('page', 1, type=int)
+    per_page = 10  # 每页显示的项目数量
+    
     if request.method == 'GET':
+        user_games = GoHist.query.filter_by(user_id=current_user.id).paginate(page, per_page, False)
         user_games = GoHist.query.filter_by(user_id=current_user.id).all()
         game_info = [{'id': game.id, 'name': game.game_name} for game in user_games]
         return jsonify(game_info)
     else:
         return jsonify('ERROR METHODS'), 501
-    
+
