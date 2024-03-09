@@ -11,7 +11,6 @@ bp = Blueprint('test',__name__,url_prefix='/test')
 def test():
 
     users = User.query.all()
-
     # user_list = [{"id": user.id, "username": user.username, "email": user.email, "password":user.password} for user in users]
     user_games = current_user.go_hists
     # 遍历打印所有对局的游戏数据

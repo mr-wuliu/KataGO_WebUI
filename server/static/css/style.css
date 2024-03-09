@@ -15,18 +15,29 @@ body {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 
     padding: 20px;
-    width: 300px auto;
-    max-width: 600px;
+    width: 80%; /* 增加容器宽度 */
+    max-width: 1000px; /* 或根据需求调整最大宽度 */
+    margin: 20px auto; /* 增加上下外边距，并居中 */
 }
+
+.container-login {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+    padding: 20px;
+    width: 100%; /* 增加容器宽度 */
+    max-width: 300px; /* 或根据需求调整最大宽度 */
+    margin: 20px auto; /* 增加上下外边距，并居中 */
+}
+
 
 h1 {
     text-align: center;
     color: #333;
 }
 
-.form-group {
-    margin-bottom: 20px;
-}
+
 
 label {
     display: block;
@@ -59,6 +70,13 @@ input[type="submit"]:hover {
     background-color: #0056b3;
 }
 
+.button-group {
+    display: flex; /* 使按钮并排显示 */
+    justify-content: start; /* 对齐到容器的开始位置 */
+    align-items: center; /* 垂直居中对齐 */
+    gap: 10px; /* 按钮之间的间隙 */
+}
+
 button {
     width: 100%;
     padding: 10px;
@@ -87,11 +105,26 @@ button:hover {
 }
 
 .game-info {
+    display: flex;
+    flex-direction: row; /* 保持行方向，以适应不同的内容 */
+    flex-wrap: wrap; /* 允许内容换行 */
+    justify-content: flex-start; /* 从行头开始对齐内容 */
+    align-items: flex-start; /* 从列头开始对齐内容 */
+
     margin-top: 20px;
-    padding: 20px;
+    padding: 10px;
+    border-bottom: 1px solid #eee; /* 添加分隔线 */
+    margin-bottom: 5px; /* 添加底部外边距 */
     background-color: #f9f9f9;
     border-radius: 8px;
 }
+
+.game-info > div {
+    margin-right: 20px; /* 在条目之间添加右边距 */
+    margin-bottom: 10px; /* 在条目之间添加底部边距 */
+    min-width: 150px; /* 设置最小宽度 */
+}
+
 .game-info h2 {
     margin-bottom: 10px;
     color: #555;
@@ -99,6 +132,17 @@ button:hover {
 .game-info p {
     color: #777;
 }
+
+.game-info-section {
+    display: flex;
+    flex-direction: column;
+    margin-top: 20px;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    border: 1px solid #ddd; /* 轻微的边框可以增加定义 */
+}
+
 .game-link {
     display: block;
     padding: 10px;
@@ -115,6 +159,46 @@ button:hover {
 
     
 }
+.game-link,
+#play-button {
+    padding: 10px;
+    background-color: #007bff;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+    border: none; /* 移除边框 */
+    cursor: pointer;
+    white-space: nowrap; /* 防止文字换行 */
+}
+
+
+
+.games-list {
+    display: flex;
+    flex-direction: column;
+    width: 100%; /* 确保列表宽度充满容器 */
+}
+
+.game-action-links {
+    display: flex;
+    justify-content: start; /* 项目开始位置对齐 */
+    align-items: center; /* 项目在交叉轴上居中对齐 */
+    gap: 10px; /* 项目之间间隔10px */
+}
+
+/* 登出按钮的特殊样式，确保文字水平显示 */
+.logout-link {
+    display: flex; /* 使用flex布局 */
+    align-items: center; /* 居中对齐 */
+    justify-content: center; /* 内容居中 */
+    writing-mode: horizontal-tb; /* 文字水平排列 */
+}
+
+
+.form-group {
+    margin-bottom: 20px;
+}
 
 .form-popup {
     display: none;
@@ -124,7 +208,47 @@ button:hover {
     transform: translate(-50%, -50%);
     background-color: white;
     padding: 20px;
-    border: 1px solid black;
+    border: 3px solid rgb(164, 161, 161);
+    border-radius: 5px;
     z-index: 999;
 }
 
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.pagination button {
+    margin: 0 10px;
+    padding: 5px 10px;
+    background-color: #007bff;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    cursor: pointer;
+}
+
+.pagination button:hover {
+    background-color: #0056b3;
+}
+
+.pagination span {
+    color: #333;
+    font-size: 16px;
+}
+
+/* 响应式设计：在小屏幕上调整按钮尺寸 */
+@media (max-width: 768px) {
+    .game-action-links {
+        flex-direction: column; /* 在小屏幕上按钮垂直排列 */
+        align-items: stretch; /* 拉伸按钮填满容器宽度 */
+    }
+
+    .game-link,
+    #play-button {
+        width: 100%; /* 按钮宽度为100% */
+    }
+}

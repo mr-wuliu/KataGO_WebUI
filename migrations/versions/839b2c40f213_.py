@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: bdc8d4c2120b
+Revision ID: 839b2c40f213
 Revises: 
-Create Date: 2024-03-05 23:34:29.613074
+Create Date: 2024-03-09 12:47:12.428203
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'bdc8d4c2120b'
+revision = '839b2c40f213'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -29,6 +29,8 @@ def upgrade():
     )
     op.create_table('go_hist',
     sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('create_at', sa.DateTime(), nullable=True),
+    sa.Column('play_datetime', sa.DateTime(), nullable=True),
     sa.Column('game_name', sa.String(length=64), nullable=False),
     sa.Column('game_data', sa.Text(), nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=True),

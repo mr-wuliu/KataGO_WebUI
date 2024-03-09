@@ -5,16 +5,21 @@
 <body>
     <div class="container">
         <h1>Welcome to Go Game</h1>
-        <div class="game-info">
-            <h2>About Go Game</h2>
-            <p>Go is a classic board game originated from China. It is played by two players who take turns placing
-                black and white stones on a grid board.</p>
-            <p>It is known for its simple rules yet deep strategic complexity, making it one of the most challenging and
-                rewarding board games ever created.</p>
-            {# <a href="/play" class="game-link">Play Go Game</a> #}
-            <button id="play-button" class="game-link">Play Go Game</button>
-            <a href="{{ url_for('auth.logout') }}" class="game-link">登出</a></li>
-        </div>
+        <section class="game-info-section">
+            <article class="game-info">
+                <h2>About Go Game</h2>
+                <p>Go is a classic board game originated from China. It is played by two players who take turns placing
+                    black and white stones on a grid board.</p>
+                <p>It is known for its simple rules yet deep strategic complexity, making it one of the most challenging
+                    and
+                    rewarding board games ever created.</p>
+                <div class="button-group">
+                    <button id="play-button" class="game-link">Play Go Game</button>
+                    <a href="{{ url_for('auth.logout') }}" class="game-link logout-link">登出</a>
+                    {# <a href="{{ url_for('auth.logout') }}" class="game-link">登出</a> #}
+                </div>
+    </div>
+    </section>
     </div>
     <div id="form-popup" class="form-popup">
         <button id="close-button" class="close-button">Close</button>

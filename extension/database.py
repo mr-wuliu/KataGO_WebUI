@@ -29,7 +29,6 @@ class User(db.Model, UserMixin):
     
 
 class GoHist(db.Model):
-    # TODO: 对局时间等信息
     __tablename__ = 'go_hist'
     id = db.Column(db.Integer, primary_key=True)
     create_at = db.Column(db.DateTime, default=datetime.datetime.now)

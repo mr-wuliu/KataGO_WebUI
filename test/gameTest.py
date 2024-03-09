@@ -178,4 +178,4 @@ def testC():
     go.print_tree()
     game.print_tree()
 if __name__ == '__main__':
-    testC()
+    testA()

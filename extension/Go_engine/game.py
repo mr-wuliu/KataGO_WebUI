@@ -220,7 +220,7 @@ class BaseGame:
             'black':self.black_name,
             'game_name':self.game_name,
         }
-        return json.dumps(graph, indent=4)
+        return json.dumps(graph, indent=4).replace(' ','').replace('\n','')
     
     @classmethod
     def from_json(cls, json_data):
