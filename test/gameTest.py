@@ -177,5 +177,38 @@ def testC():
     game.play_move(actions2)
     go.print_tree()
     game.print_tree()
+
+def parse_sgf(sgf_content):
+    import re
+    game = BaseGame()
+    # 匹配属性和值
+    properties = re.findall(r';(\w+)\[([^]]*)\]', sgf_content)
+    print(properties)
+
+    for prop, val in properties:
+        print(prop)
+        # 处理不同的属性
+        if prop == 'B' or prop == 'W':
+            print(val)
+            # 添加棋子移动
+            col = ord(val[0]) - ord('a')
+            row = ord(val[1]) - ord('a')
+            row = 19 - row
+            color : Color = prop.lower() # type: ignore
+            move : Move = (col, row)
+            ac : Action = (color, move)
+            game.play_move(ac)
+        # else:
+        #     print(prop)
+            # 设置游戏属性
+            # game.set_property(prop, val)
+
+    return game
+def testD():
+    # 示例使用
+    sgf_content = "(;GM[1]FF[4]SZ[19];B[pd];W[dd];B[qp];W[dp];B[cf];W[cc])"
+    game = parse_sgf(sgf_content)
+    game.print_tree()
+
 if __name__ == '__main__':
-    test2()
+    testD()
