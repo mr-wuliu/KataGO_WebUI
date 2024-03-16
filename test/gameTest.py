@@ -1,6 +1,5 @@
 import sys
 import os
-
 # 添加父目录到sys.path
 parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(parent_dir)
@@ -177,6 +176,7 @@ def testC():
     game.play_move(actions2)
     go.print_tree()
     game.print_tree()
+
 
 def parse_sgf(sgf_content):
     import re
