@@ -11,6 +11,14 @@ from wtforms import validators
 from extension import db, GoHist, User
 from extension import BaseGame
 
+'''
+棋局分析界面
+
+函数:
+展示棋局: 由home跳转而来
+
+'''
+
 class LoadBoard(FlaskForm):
     id = IntegerField("id",[validators.DataRequired()])
 

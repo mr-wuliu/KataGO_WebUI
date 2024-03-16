@@ -12,6 +12,20 @@ from wtforms import StringField, IntegerField, validators
 from extension import BaseGame
 from extension import Action, Move, Color
 
+'''
+包含页面:
+对局管理
+展示历史数据
+
+需要构建的函数:
+创建对局, 删除对局
+查询历史对局
+登出
+点击对局跳转到分析页面
+上传/下载sfg文件
+
+'''
+
 class NewBoard(FlaskForm):
     game_name = StringField("Game Name",[validators.DataRequired()])
     white_player = StringField("White Player")
@@ -79,7 +93,7 @@ def create():
         go_hist = GoHist()
         go_hist.game_name = form.game_name.data
         go_hist.game_data = game.toJSON()
-        go_hist.user = current_user
+        go_hist.user = current_user # type: ignore
 
         
         db.session.add(go_hist)
@@ -96,7 +110,7 @@ def hist_play():
     per_page = 10  # 每页显示的项目数量
     
     if request.method == 'GET':
-        user_games = GoHist.query.filter_by(user_id=current_user.id).paginate(page, per_page, False)
+        user_games = GoHist.query.filter_by(user_id=current_user.id).paginate(page=page, per_page=per_page, count=False)
         user_games = GoHist.query.filter_by(user_id=current_user.id).all()
         game_info = [{'id': game.id, 'name': game.game_name} for game in user_games]
         return jsonify(game_info)
