@@ -15,7 +15,7 @@ public:
     void addProperty(const std::string& key, const std::string& value);
 };
 
-SGFNode* parseSGF(const std::string& sgf_content, size_t* pos_ptr = nullptr);
-void deleteSGFNode(SGFNode* node); // Helper function for memory cleanup
+SGFNode* parseSGF(const std::string& sgf_content);
+void printBranches(const SGFNode* node, const std::string& indent="");
 
 #endif // SGFPARSER_H
