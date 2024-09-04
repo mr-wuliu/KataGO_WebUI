@@ -9,7 +9,7 @@
 |_ KatagoAI
 |_ Repositories
 |_ Services
-|_Program.cs
+|_ Program.cs
 ```
 
 
