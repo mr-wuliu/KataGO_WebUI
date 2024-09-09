@@ -4,7 +4,7 @@ namespace WuliuGO.GameLogic.utils
     public class GoNode
     {
         public Color color = Color.Blank;
-        public Action action = new NoneAction();
+        public Action? action;
 
         public bool isMain = true; // 是否是主节点
 

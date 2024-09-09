@@ -1,5 +1,3 @@
-
-
 using WuliuGO.GameLogic.utils;
 
 /**
@@ -29,7 +27,7 @@ namespace WuliuGO.GameLogic
 
         }
 
-        public bool PlayAction(Operation opt)
+        public bool PlayAction(PlayerOperation opt)
         {
             /**
              * 使用 is 的有优势:
@@ -51,11 +49,6 @@ namespace WuliuGO.GameLogic
             else if (opt.Action is Pass pass)
             {
                 // TODO: 暂时不支持跳过
-                return false;
-            }
-            else if (opt.Action is NoneAction none)
-            {
-                // 非初始节点不允许None操作
                 return false;
             }
             // TODO: 更新节点和状态

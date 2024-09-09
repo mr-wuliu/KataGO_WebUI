@@ -16,7 +16,7 @@ namespace WuliuGO.Services
             return _goGame.GetBoard();
         }
 
-        public void PlayAction(Operation operation)
+        public void PlayAction(PlayerOperation operation)
         {
             _goGame.PlayAction(operation);
         }

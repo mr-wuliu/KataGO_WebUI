@@ -5,7 +5,6 @@
 ```
 |_ Controllers
 |_ GameLogic
-|_ Helpers
 |_ KatagoAI
 |_ Repositories
 |_ Services

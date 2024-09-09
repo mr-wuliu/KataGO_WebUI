@@ -1,7 +1,9 @@
-
-public enum Color
+namespace WuliuGO.GameLogic
 {
-    Blank = 0,
-    Black = 1,
-    White = 2,
+    public enum Color
+    {
+        Blank = 0,
+        Black = 1,
+        White = 2,
+    }
 }
