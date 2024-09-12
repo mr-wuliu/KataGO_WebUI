@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using WuliuGO.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,6 +11,11 @@ builder.Services.AddControllers()
         // options.SerializerSettings.TypeNameHandling = Newtonsoft.Json.TypeNameHandling.Auto;
     });
 
+// Connect pg
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 // Register GoGameService
 builder.Services.AddSingleton<GoGameService>();
@@ -30,6 +36,5 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-// app.UseHttpsRedirection();
 app.MapControllers(); // 将请求映射到控制器
 app.Run();
