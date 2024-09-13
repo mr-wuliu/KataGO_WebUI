@@ -21,34 +21,13 @@ namespace WuliuGO.GameLogic
         private const int MAX_BOARD_SIZE = 19;
         private const int MAX_BRANCH_NUM = 10;
         private Board _board;
-        private bool _currentPlayer;
-        private PlayMode _mode;
-        public List<PlayerInfo> Players { get; set; } = [];
-
         // 根节点
         private readonly TreeNode<GoNode> _goTree;
         // 当前节点
         private TreeNode<GoNode> _currentNdoe;
-        public GoGame(long play1=0, long play2=1, PlayMode mode=PlayMode.Game)
+        public GoGame(int size=19)
         {
-            // 添加对局人
-            Players.Add(
-                new PlayerInfo()
-                {
-                    color = Color.Black,
-                    id = play1
-                }
-            );
-            Players.Add(
-                new PlayerInfo()
-                {
-                    color = Color.White,
-                    id = play2
-                }
-            );
-            _currentPlayer = true;
-            _mode = mode;
-            _board = new Board(19);
+            _board = new Board(size);
             _goTree = new TreeNode<GoNode>();
             _currentNdoe = _goTree;
 
