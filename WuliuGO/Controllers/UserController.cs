@@ -8,18 +8,16 @@ namespace WuliuGO.Controllers
     [Route("api/[controller]")]
     public class UserController : ControllerBase
     {
-        private readonly IUserRepository _userRepository;
         private readonly UserService _userService;
-        public UserController(IUserRepository userRepository, UserService userService)
+        public UserController(UserService userService)
         {
-            _userRepository = userRepository;
             _userService = userService;
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetUserById(int id)
         {
-            var user = await _userRepository.GetUserByIdAsync(id);
+            var user = await _userService.GetUserByIdAsync(id);
             if (user == null)
             {
                 return NotFound();
@@ -30,42 +28,39 @@ namespace WuliuGO.Controllers
         [HttpGet("getAll")]
         public async Task<IActionResult> GetAllUsers()
         {
-            var users = await _userRepository.GetAllUsersAsync();
+            var users = await _userService.GetAllUsersAsync();
             return Ok(users);
         }
 
         [HttpPost("add")]
-        public async Task<IActionResult> AddUser([FromBody] User user)
+        public  IActionResult AddUser([FromBody] User user)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            await _userRepository.AddUserAsync(user);
+            _userService.AddUserAsync(user);
             return CreatedAtAction(nameof(GetUserById), new { id = user.Id }, user);
         }
 
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] long userId)
         {
-            var user = await _userRepository.GetUserByIdAsync(userId);
+            var user = await _userService.GetUserByIdAsync(userId);
             if (user == null)
             {
                 return NotFound($"User with Id: {userId} not NotFound");
             }
-            // Store the user Id in the session
             _userService.SetCurrentUser(userId);
-            // HttpContext.Session.SetString("UserId", user.Id.ToString());
             return Ok(new {
                 Message = "Login successful",
                 UserId = user.Id
             });
         }
-        [HttpGet("test")]
+        [HttpGet("info")]
         public IActionResult Test()
         {
             // 验证是否登录成功
-            // var userId = HttpContext.Session.GetInt32("UserId");
             var userId = _userService.GetCurrentUserId();
             if (userId == 0)
             {
