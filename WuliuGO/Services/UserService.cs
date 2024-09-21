@@ -11,7 +11,7 @@ namespace WuliuGO.Services
         {
             _httpContextAccessor = httpContextAccessor;
         }
-        public void SetCurrentUser(int userId)
+        public void SetCurrentUser(long userId)
         {
             _httpContextAccessor.HttpContext?.Session.SetLong(UserIdSessionKey, userId);
         }

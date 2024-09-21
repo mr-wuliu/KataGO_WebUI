@@ -54,7 +54,8 @@ namespace WuliuGO.Controllers
                 return NotFound($"User with Id: {userId} not NotFound");
             }
             // Store the user Id in the session
-            HttpContext.Session.SetString("UserId", user.Id.ToString());
+            _userService.SetCurrentUser(userId);
+            // HttpContext.Session.SetString("UserId", user.Id.ToString());
             return Ok(new {
                 Message = "Login successful",
                 UserId = user.Id
@@ -64,8 +65,9 @@ namespace WuliuGO.Controllers
         public IActionResult Test()
         {
             // 验证是否登录成功
-            var userId = HttpContext.Session.GetInt32("UserId");
-            if (userId == null)
+            // var userId = HttpContext.Session.GetInt32("UserId");
+            var userId = _userService.GetCurrentUserId();
+            if (userId == 0)
             {
                 return Unauthorized();
             }
