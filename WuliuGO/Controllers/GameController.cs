@@ -79,53 +79,6 @@ namespace WuliuGO.Controllers
         {
             return _goGameService.GetBranch();
         }
-
-        [HttpGet("test")]
-        public ActionResult<string> Test()
-        {
-            GameLogic.GoGame goGame = new();
-            PlayerOperation opt = new(
-                Color.Black, new Position (0, 0)
-            );
-            PlayerOperation opt2 = new(
-                Color.White, new Position (0, 1)
-            );
-            PlayerOperation opt3 = new(
-                Color.White, new Position (1, 1)
-            );
-            PlayerOperation opt4 = new(
-                Color.Black, new Position (1, 0)
-            );
-            PlayerOperation opt5 = new(
-                Color.White, new Position (2, 0)
-            );
-            PlayerOperation opt6 = new(
-                Color.Blank, new Revoke()
-            );
-            Console.WriteLine(goGame.GetBranch());
-            goGame.PlayAction(opt);
-            Console.WriteLine(goGame.GetBranch());
-            goGame.PlayAction(opt2);
-            Console.WriteLine(goGame.GetBranch());
-            goGame.PlayAction(opt3);
-            Console.WriteLine(goGame.GetBranch());
-            goGame.PlayAction(opt4);
-            Console.WriteLine(goGame.GetBranch());
-            goGame.PlayAction(opt5);
-            Console.WriteLine(goGame.GetBranch());
-            goGame.PlayAction(opt6);
-            Console.WriteLine(goGame.GetBranch());
-            goGame.PlayAction(opt6);
-            Console.WriteLine(goGame.GetBranch());
-            goGame.PlayAction(opt6);
-            Console.WriteLine(goGame.GetBranch());
-            goGame.PlayAction(opt6);
-            Console.WriteLine(goGame.GetBranch());
-            goGame.PlayAction(opt6);
-            Console.WriteLine(goGame.GetBranch());
-
-            return goGame.GetBoard();
-        }
         
     }
 }

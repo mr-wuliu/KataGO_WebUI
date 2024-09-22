@@ -1,39 +1,183 @@
 using System.Diagnostics;
-using System.Text;
+using KatagoDtos;
+using Newtonsoft.Json;
+using Serilog;
+using WuliuGO.Models;
 
-public class KatagoServer
+namespace WuliuGO.Services
 {
-    private const string KatagoPath = "path/to/katago";
-    private const string ConfigPath = "path/to/katago/config.cfg";
-    private const string ModelPath = "path/to/katago/model.bin";
-
-    public async Task<string> GetKatagoAnalysis(string boardState)
+    public class KatagoServer
     {
-        var startInfo = new ProcessStartInfo
+        private readonly IServiceProvider _serviceProvider;
+        private const string KatagoPath = "KatagoAI/ai/katago.exe";
+        private const string ConfigPath = "KatagoAI/ai/cfg/analysis_example.cfg";
+        private const string ModelPath = "KatagoAI/ai/model/kata1-b28c512nbt-s7332806912-d4357057652.bin.gz";
+        private Process? _katagoProcess;
+        public KatagoServer(IServiceProvider serviceProvider)
         {
-            FileName = KatagoPath,
-            Arguments = $"analysis -config {ConfigPath} -model {ModelPath}",
-            RedirectStandardInput = true,
-            RedirectStandardOutput = true,
-            UseShellExecute = false,
-            CreateNoWindow = true
-        };
-
-        using var process = new Process { StartInfo = startInfo };
-        process.Start();
-
-        await process.StandardInput.WriteLineAsync(boardState);
-        await process.StandardInput.FlushAsync();
-        process.StandardInput.Close();
-
-        var output = new StringBuilder();
-        while (!process.StandardOutput.EndOfStream)
-        {
-            output.AppendLine(await process.StandardOutput.ReadLineAsync());
+            _serviceProvider = serviceProvider;
         }
+        public string StartKatago()
+        {
+            if (_katagoProcess != null && !_katagoProcess.HasExited)
+            {
+                return "already started and exited";
+            }
 
-        await process.WaitForExitAsync();
+            var startInfo = new ProcessStartInfo
+            {
+                FileName = KatagoPath,
+                Arguments = $"analysis -config {ConfigPath} -model {ModelPath}",
+                RedirectStandardOutput = true,
+                RedirectStandardInput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
 
-        return output.ToString();
+            _katagoProcess = new Process()
+            {
+                StartInfo = startInfo,
+                EnableRaisingEvents = true
+            };
+
+            _katagoProcess.OutputDataReceived += (sender, args) => OnKatagoOutput(args.Data);
+            _katagoProcess.ErrorDataReceived += (sender, args) => OnKatagoError(args.Data);
+            _katagoProcess.Start();
+            _katagoProcess.BeginOutputReadLine();
+            _katagoProcess.BeginErrorReadLine();
+
+            return "start KataGo process.";
+
+        }
+        public void OnKatagoOutput(string? data)
+        {
+            if (!string.IsNullOrEmpty(data))
+            {
+                try
+                {
+                    using var scope = _serviceProvider.CreateScope();
+                    var katagoRepository = scope.ServiceProvider.GetRequiredService<IKatagoRepository>();
+                    var result = JsonConvert.DeserializeObject<KatagoOutput>(data);
+
+                    if (result != null)
+                    {
+                        string queryId = result.Id;
+                        var katagoQuery = katagoRepository.GetKatagoQueryByQueryIdAsync(queryId).Result;
+                        if (katagoQuery != null)
+                        {
+                            // update database
+                            katagoQuery.IsDuringSearch = result.IsDuringSearch;
+                            katagoQuery.MoveInfos = JsonConvert.SerializeObject(result.MoveInfos);
+                            katagoQuery.RootInfo = JsonConvert.SerializeObject(result.RootInfo);
+                            katagoQuery.TurnNumber = result.TurnNumber;
+
+                            katagoRepository.UpdateKatagoQueryAsync(katagoQuery).Wait();
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Log.Error($"[KataGo Error]: {ex.Message}");
+                }
+            }
+        }
+        public void OnKatagoError(string? data)
+        {
+            if (!string.IsNullOrEmpty(data))
+                Log.Information($"[KataGo INFO]: {data}");
+        }
+        public bool StopKatago()
+        {
+            if (_katagoProcess != null && !_katagoProcess.HasExited)
+            {
+                _katagoProcess.Kill();
+                _katagoProcess.WaitForExit(5000);
+                _katagoProcess.Dispose();
+                _katagoProcess = null;
+                return true;
+            }
+            return false;
+        }
+        public bool GetStatus()
+        {
+            return _katagoProcess != null && !_katagoProcess.HasExited;
+        }
+        /**
+         * Analyze the board with KataGo.
+         */
+        public async Task<string> AnaylyzeBoardAsync(QueryDto dto)
+        {
+            // 长生命周期服务请求短生命周期服务需要使用scope获取服务
+            using var scope = _serviceProvider.CreateScope();
+            var katagoRepository = scope.ServiceProvider.GetRequiredService<IKatagoRepository>();
+
+
+            if (_katagoProcess == null || _katagoProcess.HasExited)
+            {
+                return "Katago is not running.";
+            }
+            // check params;
+            if (dto.moves.Count == 0)
+            {
+                return "Invalid query params";
+            }
+            // 创建数据库记录
+            var katagoQuery = new KatagoQuery
+            {
+                IsDuringSearch = true,
+            };
+            var stopwatch = Stopwatch.StartNew();
+
+            await katagoRepository.AddKatagoQueryAsync(katagoQuery);
+            katagoQuery.QueryId = "go_" + katagoQuery.Id;
+            _ = katagoRepository.UpdateKatagoQueryAsync(katagoQuery);
+
+
+            var query = new
+            {
+                id = katagoQuery.QueryId,
+                moves = dto.moves,
+                initialStones = Array.Empty<object>(),
+                rules = "Chinese",
+                komi = 6.5,
+                boardXSize = 19,
+                boardYSize = 19,
+                includePolicy = true,
+                maxVisits = 100,
+            };
+            string jsonQuery = JsonConvert.SerializeObject(query);
+            _katagoProcess.StandardInput.WriteLine(jsonQuery);
+            _katagoProcess.StandardInput.Flush();
+            return katagoQuery.QueryId;
+        }
+        public async Task<KatagoQueryRest?> GetQueryByQueryId(string queryId)
+        {
+            using var scope = _serviceProvider.CreateScope();
+            var katagoRepository = scope.ServiceProvider.GetRequiredService<IKatagoRepository>();
+
+            var result = await katagoRepository.GetKatagoQueryByQueryIdAsync(queryId);
+
+            if (result == null)
+            {
+                return null;
+            }
+
+            var katagoRest = new KatagoQueryRest
+            {
+                Id = result.QueryId
+            };
+
+            if (result.MoveInfos != null)
+            {
+                katagoRest.Moves = JsonConvert.DeserializeObject<List<MoveInfo>>(result.MoveInfos)?.Take(4).ToList();
+
+            }
+            if (result.RootInfo != null)
+            {
+                katagoRest.RootInfo = JsonConvert.DeserializeObject<RootInfo>(result.RootInfo);
+            }
+            return katagoRest;
+        }
     }
 }

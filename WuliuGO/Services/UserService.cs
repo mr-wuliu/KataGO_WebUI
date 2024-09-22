@@ -9,8 +9,9 @@ namespace WuliuGO.Services
         private readonly IUserRepository _userRepository;
         private const string UserIdSessionKey = "UserId";
 
-        public UserService(IHttpContextAccessor httpContextAccessor)
+        public UserService(IUserRepository userRepository, IHttpContextAccessor httpContextAccessor)
         {
+            _userRepository = userRepository;
             _httpContextAccessor = httpContextAccessor;
         }
         public void SetCurrentUser(long userId)

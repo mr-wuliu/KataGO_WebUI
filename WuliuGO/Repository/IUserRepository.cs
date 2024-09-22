@@ -1,4 +1,3 @@
-
 using WuliuGO.Models;
 
 public interface IUserRepository
