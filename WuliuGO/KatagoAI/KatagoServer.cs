@@ -17,6 +17,18 @@ namespace WuliuGO.Services
         {
             _serviceProvider = serviceProvider;
         }
+        private async Task<string> InsertQuery(KatagoQuery katagoQuery)
+        {
+            // 长生命周期服务请求短生命周期服务需要使用scope获取服务
+            using var scope = _serviceProvider.CreateScope();
+            var katagoRepository = scope.ServiceProvider.GetRequiredService<IKatagoRepository>();
+
+            await katagoRepository.AddKatagoQueryAsync(katagoQuery);
+            katagoQuery.QueryId = "go_" + katagoQuery.Id;
+            _ = katagoRepository.UpdateKatagoQueryAsync(katagoQuery);
+
+            return katagoQuery.QueryId;
+        }
         public string StartKatago()
         {
             if (_katagoProcess != null && !_katagoProcess.HasExited)
@@ -103,14 +115,9 @@ namespace WuliuGO.Services
         {
             return _katagoProcess != null && !_katagoProcess.HasExited;
         }
-        /**
-         * Analyze the board with KataGo.
-         */
+
         public async Task<string> AnaylyzeBoardAsync(QueryDto dto)
         {
-            // 长生命周期服务请求短生命周期服务需要使用scope获取服务
-            using var scope = _serviceProvider.CreateScope();
-            var katagoRepository = scope.ServiceProvider.GetRequiredService<IKatagoRepository>();
 
 
             if (_katagoProcess == null || _katagoProcess.HasExited)
@@ -127,16 +134,16 @@ namespace WuliuGO.Services
             {
                 IsDuringSearch = true,
             };
-            var stopwatch = Stopwatch.StartNew();
-
-            await katagoRepository.AddKatagoQueryAsync(katagoQuery);
-            katagoQuery.QueryId = "go_" + katagoQuery.Id;
-            _ = katagoRepository.UpdateKatagoQueryAsync(katagoQuery);
-
+            string queryId = await InsertQuery(
+                new KatagoQuery
+                {
+                    IsDuringSearch = true,
+                }
+            );
 
             var query = new
             {
-                id = katagoQuery.QueryId,
+                id = queryId,
                 moves = dto.moves,
                 initialStones = Array.Empty<object>(),
                 rules = "Chinese",
@@ -149,7 +156,7 @@ namespace WuliuGO.Services
             string jsonQuery = JsonConvert.SerializeObject(query);
             _katagoProcess.StandardInput.WriteLine(jsonQuery);
             _katagoProcess.StandardInput.Flush();
-            return katagoQuery.QueryId;
+            return queryId;
         }
         public async Task<KatagoQueryRest?> GetQueryByQueryId(string queryId)
         {
@@ -178,6 +185,24 @@ namespace WuliuGO.Services
                 katagoRest.RootInfo = JsonConvert.DeserializeObject<RootInfo>(result.RootInfo);
             }
             return katagoRest;
+        }
+        public async Task<string> GetKatagoInfoAsync()
+        {
+            if (_katagoProcess == null || _katagoProcess.HasExited)
+            {
+                return "Katago is not running.";
+            }
+            var query = new
+            {
+                id = "info",
+                action = "query_models",
+            };
+            _katagoProcess.StandardInput.WriteLine(JsonConvert.SerializeObject(query));
+            _katagoProcess.StandardInput.Flush();
+            string? result = await _katagoProcess.StandardOutput.ReadLineAsync();
+
+            return result ?? "No response from KataGo";
+
         }
     }
 }

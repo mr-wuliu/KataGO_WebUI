@@ -7,8 +7,14 @@ var builder = WebApplication.CreateBuilder(args);
 // set logger
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Debug()
-    .WriteTo.File("logs/wuliugo-.log", rollingInterval: RollingInterval.Day) // 主日志文件
+    .WriteTo.File(
+        path: "logs/wuliugo-.log",
+        rollingInterval: RollingInterval.Day,
+        rollOnFileSizeLimit: true,
+        retainedFileCountLimit: 10
+        ) // 主日志文件
     .CreateLogger();
+
 builder.Host.UseSerilog();
 
 // Use Newtonsoft.Json as Default JsonSerilize Tool

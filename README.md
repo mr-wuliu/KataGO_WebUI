@@ -6,7 +6,7 @@ WuliuGO 围棋网页项目。
 ## 运行项目
 
 ### 先决条件
-- .NET 6.0 SDK
+- .NET 8.0 SDK
 - PostgreSQL 数据库
 
 ### 配置数据库
@@ -39,12 +39,26 @@ docker run --name pg-database -e POSTGRES_PASSWORD=mysecretpassword -d -p 5432:5
 执行
 
 ```sql
-CREATE DATABASE mydatabase;
-\c mydatabase;
-CREATE TABLE players (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(100),
-    rank INT
+-- --------------------------------------------------------
+-- 服务器版本:                        PostgreSQL 16.4 (Debian 16.4-1.pgdg120+1) on x86_64-pc-linux-gnu, compiled by gcc (Debian 12.2.0-14) 12.2.0, 64-bit
+-- HeidiSQL 版本:                  12.6.0.6765
+-- --------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS "KatagoQueries" (
+	"id" SERIAL NOT NULL,
+	"query_id" VARCHAR(255) NULL DEFAULT NULL,
+	"is_during_search" BOOLEAN NOT NULL,
+	"move_infos" JSONB NULL DEFAULT NULL,
+	"root_info" JSONB NULL DEFAULT NULL,
+	"turn_number" INTEGER NOT NULL,
+	PRIMARY KEY ("id")
 );
+CREATE TABLE IF NOT EXISTS "Users" (
+	"id" SERIAL NOT NULL,
+	"name" VARCHAR(100) NULL DEFAULT NULL,
+	"rank" INTEGER NULL DEFAULT NULL,
+	PRIMARY KEY ("id")
+);
+
 ```
 

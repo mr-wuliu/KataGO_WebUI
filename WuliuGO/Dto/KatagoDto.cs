@@ -109,4 +109,30 @@ namespace KatagoDtos
         [JsonProperty("winrate")]
         public double Winrate { get; set; }
     }
+    public class KatagoInfo
+    {
+        [JsonProperty("id")]
+        public string Id { get; set; } = string.Empty;
+        [JsonProperty("action")]
+        public string Action { get; set; } = string.Empty;
+        [JsonProperty("models")]
+        public List<KatagoModel>? models;
+
+    }
+
+    public class KatagoModel
+    {
+        [JsonProperty("name")]
+        public string Name { get; set; } = string.Empty;
+        [JsonProperty("internalName")]
+        public string InternalName { get; set; } = string.Empty;
+        [JsonProperty("maxBatchSize")]
+        public int MaxBatchSize { get; set; }
+        [JsonProperty("usesHumanSLProfile")]
+        public bool UsesHumanSLProfile { get; set; }
+        [JsonProperty("version")]
+        public string Version { get; set; } = string.Empty;
+        [JsonProperty("usingFP16")]
+        public bool UsingFP16 { get; set; }
+    }
 }
