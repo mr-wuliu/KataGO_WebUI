@@ -4,8 +4,6 @@ namespace WuliuGO.Services
 {
     public class GoGameService
     {
-
-        
         private readonly GoGame _goGame;
         // TODO: Select GoGame by gameID;
         public GoGame GetGoGameByUserId(long gameId)
@@ -17,8 +15,6 @@ namespace WuliuGO.Services
         {
             throw new NotImplementedException();
         }
-        // TODO: 
-
         public GoGameService()
         {
             _goGame = new GoGame();

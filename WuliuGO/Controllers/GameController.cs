@@ -16,6 +16,11 @@ namespace WuliuGO.Controllers
         {
             _goGameService = goGameService;
         }
+        [HttpGet("version")]
+        public ActionResult<string> GetVersion()
+        {
+            return "1.0";
+        }
 
         [HttpGet("board")]
         public ActionResult<string> GetBoard()
@@ -60,18 +65,6 @@ namespace WuliuGO.Controllers
   
 
             return Ok();
-        }
-
-        [HttpGet("getOpt")]
-        public ActionResult<Operation> GetActionResult()
-        {
-            var opt = new PlayerOperation
-            {
-                Action = new Position(9, 9),
-                Color = Color.Black
-            };
-
-            return Ok(opt);
         }
 
         [HttpGet("branch")]

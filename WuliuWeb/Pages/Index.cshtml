@@ -1,0 +1,19 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+        <div id="version"></div> <!-- 用于显示 API 版本 -->
+    <script>
+        fetch('http://127.0.0.1:5000/api/GoGame/version') // API 地址
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('version').innerText = 'API Version: ' + data;
+            })
+            .catch(error => console.error('Error:', error));
+    </script>
+</div>

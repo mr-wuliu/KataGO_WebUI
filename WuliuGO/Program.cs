@@ -7,6 +7,8 @@ var builder = WebApplication.CreateBuilder(args);
 // set logger
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Debug()
+    // 临时显示到控制台
+    .WriteTo.Console()
     .WriteTo.File(
         path: "logs/wuliugo-.log",
         rollingInterval: RollingInterval.Day,
@@ -63,12 +65,22 @@ builder.Services.AddSession( options =>
 }
 );
 
+// CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAllOrigins",
+        builder => builder.AllowAnyOrigin()
+                          .AllowAnyMethod()
+                          .AllowAnyHeader());
+});
+
 var app = builder.Build();
 
 // Timer 
 app.UseMiddleware<RequestTimingMiddleware>();
 
 app.UseSession();
+app.UseCors("AllowAllOrigins");
 
 // 配置HTTP请求管道
 if (app.Environment.IsDevelopment())
