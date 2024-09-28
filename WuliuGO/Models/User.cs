@@ -12,5 +12,6 @@ namespace WuliuGO.Models
         public required string Name { get; set; }
         [Column("rank")]
         public int Rank { get; set; }
+        
     }
 }

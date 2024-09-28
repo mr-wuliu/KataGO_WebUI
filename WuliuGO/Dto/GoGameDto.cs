@@ -22,4 +22,10 @@ namespace GameDtos
         Pass,
         Revoke,
     }
+    public class GameInitDto
+    {
+        public int Size { get; set; }
+        public string Komi { get; set; } = "6.5";
+
+    }
 }

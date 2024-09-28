@@ -31,7 +31,7 @@ WuliuGO 围棋网页项目。
 
 # 搭建数据库
 
-```bash
+```bash6
 docker pull postgres:latest
 docker run --name pg-database -e POSTGRES_PASSWORD=mysecretpassword -d -p 5432:5432 postgres
 ```

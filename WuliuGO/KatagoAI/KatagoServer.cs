@@ -6,17 +6,39 @@ using WuliuGO.Models;
 
 namespace WuliuGO.Services
 {
-    public class KatagoServer
+    public class KatagoServer : IHostedService, IKatagoServer
     {
+        private static bool _isInitialized;
         private readonly IServiceProvider _serviceProvider;
         private const string KatagoPath = "KatagoAI/ai/katago.exe";
         private const string ConfigPath = "KatagoAI/ai/cfg/analysis_example.cfg";
         private const string ModelPath = "KatagoAI/ai/model/kata1-b28c512nbt-s7332806912-d4357057652.bin.gz";
         private Process? _katagoProcess;
+
         public KatagoServer(IServiceProvider serviceProvider)
         {
+            if (!_isInitialized) {
+                Log.Information("Initializing KatagoService...");
+                _isInitialized = true;
+            } else {
+                throw new Exception("KatagoService has already been initialized.");
+            }
             _serviceProvider = serviceProvider;
+            _isInitialized = true;
         }
+        public Task StartAsync(CancellationToken cancellationToken)
+        {
+            Log.Information("Starting KatagoService...");
+            StartKatago();
+            return Task.CompletedTask;
+        }
+        public Task StopAsync(CancellationToken cancellationToken)
+        {
+            Log.Information("Stopping KatagoService...");
+            StopKatago();
+            return Task.CompletedTask;
+        }
+
         private async Task<string> InsertQuery(KatagoQuery katagoQuery)
         {
             // 长生命周期服务请求短生命周期服务需要使用scope获取服务
@@ -25,11 +47,11 @@ namespace WuliuGO.Services
 
             await katagoRepository.AddKatagoQueryAsync(katagoQuery);
             katagoQuery.QueryId = "go_" + katagoQuery.Id;
-            _ = katagoRepository.UpdateKatagoQueryAsync(katagoQuery);
+            await katagoRepository.UpdateKatagoQueryAsync(katagoQuery);
 
             return katagoQuery.QueryId;
         }
-        public string StartKatago()
+        private string StartKatago()
         {
             if (_katagoProcess != null && !_katagoProcess.HasExited)
             {
@@ -61,6 +83,18 @@ namespace WuliuGO.Services
 
             return "start KataGo process.";
 
+        }
+        private bool StopKatago()
+        {
+            if (_katagoProcess != null && !_katagoProcess.HasExited)
+            {
+                _katagoProcess.Kill();
+                _katagoProcess.WaitForExit(5000);
+                _katagoProcess.Dispose();
+                _katagoProcess = null;
+                return true;
+            }
+            return false;
         }
         public void OnKatagoOutput(string? data)
         {
@@ -99,27 +133,20 @@ namespace WuliuGO.Services
             if (!string.IsNullOrEmpty(data))
                 Log.Information($"[KataGo INFO]: {data}");
         }
-        public bool StopKatago()
-        {
-            if (_katagoProcess != null && !_katagoProcess.HasExited)
-            {
-                _katagoProcess.Kill();
-                _katagoProcess.WaitForExit(5000);
-                _katagoProcess.Dispose();
-                _katagoProcess = null;
-                return true;
-            }
-            return false;
-        }
+
         public bool GetStatus()
         {
+            Log.Information("Get Status");
+            if (_katagoProcess != null)
+            {
+                Log.Information($"[KataGo Process]: {_katagoProcess.ProcessName} - {_katagoProcess.Id}");
+            }
             return _katagoProcess != null && !_katagoProcess.HasExited;
         }
 
         public async Task<string> AnaylyzeBoardAsync(QueryDto dto)
         {
-
-
+            Log.Information("Analyze Board");
             if (_katagoProcess == null || _katagoProcess.HasExited)
             {
                 return "Katago is not running.";
@@ -130,10 +157,6 @@ namespace WuliuGO.Services
                 return "Invalid query params";
             }
             // 创建数据库记录
-            var katagoQuery = new KatagoQuery
-            {
-                IsDuringSearch = true,
-            };
             string queryId = await InsertQuery(
                 new KatagoQuery
                 {

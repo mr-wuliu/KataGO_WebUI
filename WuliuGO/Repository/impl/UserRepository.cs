@@ -1,4 +1,5 @@
 
+using System.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 using WuliuGO.Models;
 
@@ -15,7 +16,9 @@ public class UserRepository : IUserRepository
     }
     public async Task<User> GetUserByIdAsync(long id)
     {
-        return await _context.Users.FindAsync(id);
+        var users = await _context.Users.FindAsync(id);
+        Debug.Assert(users != null, "User not found");
+        return users;
     }
     public async Task AddUserAsync(User user)
     {

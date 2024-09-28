@@ -99,7 +99,7 @@ namespace WuliuGO.GameLogic
         
         public string GetBranch()
         {
-    
+            // ! FIXME: 实现为从当前节点追溯到Head, 但是实际上应该从Head根据主分支查找到末端节点
             List<string> builders = [];
             TreeNode<GoNode>? node = _currentNdoe;
             while (node != null)
@@ -115,6 +115,33 @@ namespace WuliuGO.GameLogic
             }
             builders.Reverse();
             return string.Join("", builders);
+        }
+        public List<List<string>> GetMoves()
+        {
+            List<List<string>> moves = [];
+            var node = _currentNdoe;
+            while( node != null) 
+            {
+               if (node.Value != null)
+               {
+                    string color = node.Value.color switch {
+                        Color.Black => "b",
+                        Color.White => "w",
+                        _ => "",
+                    };
+                    string move = node.Value.action switch
+                    {
+                        Position pos => MStringUtils.ConvertPositionToKataGoFormat(pos.X, pos.Y),
+                        Pass pass => "pass",
+                        _ => "",
+                    };
+                    if (move == "" || color == "") continue;
+                    moves.Add([color, move]);
+                }
+                node = node.Parent;
+            }
+            moves.Reverse();
+            return moves;
         }
     }
 }

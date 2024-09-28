@@ -1,4 +1,3 @@
-using System.Text.Json;
 using KatagoDtos;
 using Microsoft.AspNetCore.Mvc;
 using WuliuGO.Services;
@@ -9,9 +8,9 @@ namespace WuliuGO.Controllers
     [Route("api/[controller]")]
     public class KatagoController : ControllerBase
     {
-        private KatagoServer _katagoService;
+        private readonly IKatagoServer _katagoService;
 
-        public KatagoController(KatagoServer katagoService)
+        public KatagoController(IKatagoServer katagoService)
         {
             _katagoService = katagoService;
         }
@@ -25,15 +24,15 @@ namespace WuliuGO.Controllers
                 false => Ok("stopped"),
             };
         }
-        [HttpPost("start")]
-        public IActionResult StartKatago() {
-            return Ok(_katagoService.StartKatago());
-        }
-        [HttpPost("stop")]
-        public IActionResult StopKatago()
-        {
-            return _katagoService.StopKatago() ? Ok("Stopped") : Ok("Not running");
-        }
+        // [HttpPost("start")]
+        // public IActionResult StartKatago() {
+        //     return Ok(_katagoService.StartKatago());
+        // }
+        // [HttpPost("stop")]
+        // public IActionResult StopKatago()
+        // {
+        //     return _katagoService.StopKatago() ? Ok("Stopped") : Ok("Not running");
+        // }
         [HttpPost("analysis")]
         public async Task<IActionResult> Anslysis([FromBody] QueryDto dto) {
             var result = await _katagoService.AnaylyzeBoardAsync(dto);
