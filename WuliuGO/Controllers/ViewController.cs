@@ -3,8 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace WuliuGO.Controllers
 {
-    [ApiController]
-    [Route("Home")]
+    [Route("view")]
     public class ViewController : Controller
     {
         [HttpGet("welcome")]
