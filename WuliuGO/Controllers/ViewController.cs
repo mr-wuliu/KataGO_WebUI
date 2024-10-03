@@ -18,7 +18,7 @@ namespace WuliuGO.Controllers
             ViewData["Version"] = GetVersion();
             return View("GoPage");
         }
-
+        [HttpGet("version")]
         public string GetVersion()
         {
             return "1.0";
