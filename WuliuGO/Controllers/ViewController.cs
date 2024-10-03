@@ -15,13 +15,8 @@ namespace WuliuGO.Controllers
         [HttpGet("game")]
         public IActionResult GoPage()
         {
-            ViewData["Version"] = GetVersion();
+            ViewData["Version"] = "1.0";
             return View("GoPage");
-        }
-        [HttpGet("version")]
-        public string GetVersion()
-        {
-            return "1.0";
         }
     }
     
