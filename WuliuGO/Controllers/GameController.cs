@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.JsonPatch.Operations;
 using Microsoft.AspNetCore.Mvc;
 using WuliuGO.GameLogic;
 using WuliuGO.Services;
@@ -125,6 +124,16 @@ namespace WuliuGO.Controllers
             if (result == null) {
                 return NotFound();
             }
+            return Ok(result);
+        }
+        [HttpPost("policy")]
+        public async Task<IActionResult> GetPolicy([FromBody]string  queryId)
+        {
+            var userId = _userService.GetCurrentUserId();
+            if (userId == 0) {
+                return Unauthorized();
+            }
+            var result = await _goGameService.GetPolicyByQueryId(queryId);
             return Ok(result);
         }
 

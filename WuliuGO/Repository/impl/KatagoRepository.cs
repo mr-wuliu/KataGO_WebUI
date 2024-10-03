@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using WuliuGO.Models;
+using Newtonsoft.Json;
+using Serilog;
 
 public class KatagoRepository : IKatagoRepository
 {
@@ -21,11 +23,23 @@ public class KatagoRepository : IKatagoRepository
         {
             _context.AnalysisQuery.Remove(query);
             await _context.SaveChangesAsync();
-        }    }
+        }        
+    }
 
     public async Task<Analysis?> GetKatagoQueryByQueryIdAsync(string queryId)
     {
         return await _context.AnalysisQuery.FirstOrDefaultAsync(q => q.QueryId == queryId);
+    }
+    public async Task<List<double>?> GetKatagoPolicyByQueryIdAsync(string queryId)
+    {
+        var query = await _context.AnalysisQuery.FirstOrDefaultAsync(q => q.QueryId == queryId);
+        if (query != null && query.Policy != null)
+        {
+            Log.Information($" Policy: {query.Policy}");
+            return JsonConvert.DeserializeObject<List<double>?>(query.Policy);
+        }
+        return null;
+
     }
 
     public async Task UpdateKatagoQueryAsync(Analysis katagoQuery)

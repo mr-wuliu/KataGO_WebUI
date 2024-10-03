@@ -116,6 +116,8 @@ namespace WuliuGO.Services
                             katagoQuery.IsRunning = result.IsDuringSearch;
                             katagoQuery.OutputMove = JsonConvert.SerializeObject(result.MoveInfos);
                             katagoQuery.RootInfo = JsonConvert.SerializeObject(result.RootInfo);
+                            katagoQuery.Policy = JsonConvert.SerializeObject(result.Policy);
+
                             katagoQuery.TurnNumber = result.TurnNumber;
 
                             katagoRepository.UpdateKatagoQueryAsync(katagoQuery).Wait();
@@ -157,10 +159,22 @@ namespace WuliuGO.Services
                 return "Invalid query params";
             }
             // 创建数据库记录
+            var queryInfo = new 
+            {
+                rule = "Chinese",
+                komi = "6.5",
+                boardXSize = 19,
+                boardYSize = 19,
+                includePolicy = true,
+                maxVisits = 100,
+            };
             string queryId = await InsertQuery(
                 new Analysis
                 {
                     IsRunning = true,
+                    CreateTime = DateTime.UtcNow,
+                    InputMove = JsonConvert.SerializeObject(dto.moves),
+                    AnalysisInfo = JsonConvert.SerializeObject(queryInfo),
                 }
             );
 
@@ -176,6 +190,8 @@ namespace WuliuGO.Services
                 includePolicy = true,
                 maxVisits = 100,
             };
+
+
             string jsonQuery = JsonConvert.SerializeObject(query);
             _katagoProcess.StandardInput.WriteLine(jsonQuery);
             _katagoProcess.StandardInput.Flush();
@@ -226,6 +242,20 @@ namespace WuliuGO.Services
 
             return result ?? "No response from KataGo";
 
+        }
+        public async Task<List<double>?> GetKatagoPolicy(string queryId)
+        {
+            using var scope = _serviceProvider.CreateScope();
+            var katagoRepository = scope.ServiceProvider.GetRequiredService<IKatagoRepository>();
+
+            var result = await katagoRepository.GetKatagoPolicyByQueryIdAsync(queryId);
+
+            if (result == null )
+            {
+                return null;
+            }
+
+            return result;
         }
     }
 }

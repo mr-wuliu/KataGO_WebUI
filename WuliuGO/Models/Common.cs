@@ -12,7 +12,7 @@ namespace WuliuGO.Models
         /// 创建时间
         /// </summary>
         [Column("create_time")]
-        public DateTime CreateTime { get; set; } = DateTime.UtcNow;
+        public DateTime CreateTime { get; set; }
         /// <summary>
         /// 更新时间 
         /// </summary>

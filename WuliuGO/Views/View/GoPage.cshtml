@@ -1,7 +1,202 @@
 @{
-    ViewData["Title"] = "Go Play";
+    ViewData["Title"] = "围棋棋盘";
 }
 
-<h1>这里编写围棋页面</h1>
-<p>This is the homepage of your .NET Core application.</p>
-<p>Version: @ViewData["Version"]</p>  <!-- 显示版本号 -->
+<div class="page-container">
+    <div class="input-container">
+        <input type="text" id="queryIdInput" placeholder="输入查询ID" />
+        <button id="fetchPolicyButton">获取策略</button>
+    </div>
+    <h1>围棋棋盘</h1>
+    <div id="goban-container">
+        <div id="goban"></div>
+    </div>
+</div>
+
+<style>
+    body, html {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+    }
+
+    .page-container {
+        display: flex;
+        height: 100vh;
+    }
+
+    .input-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+        background-color: #f0f0f0;
+    }
+
+    .input-container input {
+        margin-bottom: 10px;
+        padding: 5px;
+        font-size: 16px;
+    }
+
+    .input-container button {
+        padding: 5px 10px;
+        font-size: 16px;
+        cursor: pointer;
+    }
+
+    h1 {
+        writing-mode: vertical-rl;
+        text-orientation: upright;
+        margin: 0;
+        padding: 20px 10px;
+        background-color: #f0f0f0;
+        font-size: 48px;
+    }
+
+    #goban-container {
+        flex-grow: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+    }
+
+    #goban {
+        width: 570px;
+        height: 570px;
+        background-color: #DEB887;
+        position: relative;
+        border: 2px solid #8B4513;
+    }
+
+    .line {
+        position: absolute;
+        background-color: #000;
+    }
+
+    .horizontal {
+        height: 1px;
+        width: 540px;
+        left: 15px;
+    }
+
+    .vertical {
+        width: 1px;
+        height: 540px;
+        top: 15px;
+    }
+
+    .star-point {
+        position: absolute;
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background-color: #000;
+    }
+
+    .policy-point {
+        position: absolute;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        opacity: 0.7;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const goban = document.getElementById('goban');
+        const container = document.getElementById('goban-container');
+        const fetchPolicyButton = document.getElementById('fetchPolicyButton');
+        const queryIdInput = document.getElementById('queryIdInput');
+        
+        function resizeGoban() {
+            const containerWidth = container.clientWidth;
+            const containerHeight = container.clientHeight;
+            const scale = Math.min(containerWidth / 570, containerHeight / 570);
+            goban.style.transform = `scale(${scale})`;
+        }
+
+        // 创建横线和竖线
+        for (let i = 0; i < 19; i++) {
+            const hline = document.createElement('div');
+            hline.className = 'line horizontal';
+            hline.style.top = (15 + i * 30) + 'px';
+            goban.appendChild(hline);
+
+            const vline = document.createElement('div');
+            vline.className = 'line vertical';
+            vline.style.left = (15 + i * 30) + 'px';
+            goban.appendChild(vline);
+        }
+
+        // 添加星位
+        const starPoints = [[3,3], [3,9], [3,15], [9,3], [9,9], [9,15], [15,3], [15,9], [15,15]];
+        starPoints.forEach(point => {
+            const star = document.createElement('div');
+            star.className = 'star-point';
+            star.style.left = (point[0] * 30 + 12) + 'px';
+            star.style.top = (point[1] * 30 + 12) + 'px';
+            goban.appendChild(star);
+        });
+
+        async function fetchPolicy(queryId) {
+            try {
+                const response = await fetch('/api/GoGame/policy', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json-patch+json'
+                    },
+                    body: JSON.stringify(queryId)
+                });
+
+                if (!response.ok) {
+                    throw new Error('获取策略数据失败');
+                }
+
+                const policyArray = await response.json();
+                displayPolicy(policyArray);
+            } catch (error) {
+                console.error('获取策略数据时出错:', error);
+            }
+        }
+
+        function displayPolicy(policyArray) {
+            // 清除现有的策略点
+            document.querySelectorAll('.policy-point').forEach(el => el.remove());
+
+            // 添加新的策略点
+            policyArray.forEach((value, index) => {
+                const x = index % 19;
+                const y = Math.floor(index / 19);
+                const policyPoint = document.createElement('div');
+                policyPoint.className = 'policy-point';
+                policyPoint.style.left = (x * 30 + 1) + 'px';
+                policyPoint.style.top = (y * 30 + 1) + 'px';
+
+                if (value > 0.5) {
+                    policyPoint.style.backgroundColor = `rgba(0, 255, 0, ${value})`;
+                } else {
+                    policyPoint.style.backgroundColor = `rgba(255, 0, 0, ${value})`;
+                }
+
+                goban.appendChild(policyPoint);
+            });
+        }
+
+        fetchPolicyButton.addEventListener('click', () => {
+            const queryId = queryIdInput.value;
+            if (queryId) {
+                fetchPolicy(queryId);
+            } else {
+                alert('请输入查询ID');
+            }
+        });
+
+        resizeGoban();
+        window.addEventListener('resize', resizeGoban);
+    });
+</script>

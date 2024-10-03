@@ -22,6 +22,8 @@ namespace KatagoDtos
         public bool IsDuringSearch { get; set; }
         [JsonProperty("moveInfos")]
         public required List<object> MoveInfos { get; set; }
+        [JsonProperty("policy")]
+        public List<double>? Policy { get; set; }
         [JsonProperty("rootInfo")]
         public object? RootInfo { get; set; }
         [JsonProperty("turnNumber")]

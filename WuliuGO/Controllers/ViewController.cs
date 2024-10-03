@@ -1,11 +1,18 @@
-
 using Microsoft.AspNetCore.Mvc;
+using WuliuGO.Services;
 
 namespace WuliuGO.Controllers
 {
     [Route("view")]
     public class ViewController : Controller
     {
+        private readonly GoGameService _goGameService;
+        private readonly UserService _userService;
+        public ViewController(GoGameService goGameService,UserService userService)
+        {
+            _goGameService = goGameService;
+            _userService = userService; 
+        }
         [HttpGet("welcome")]
         public IActionResult Index()
         {
@@ -14,7 +21,6 @@ namespace WuliuGO.Controllers
         [HttpGet("game")]
         public IActionResult GoPage()
         {
-            ViewData["Version"] = "1.0";
             return View("GoPage");
         }
     }

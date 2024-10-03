@@ -78,7 +78,11 @@ namespace WuliuGO.Services
             }
             var branchList = game.GetMoves();
             return branchList;
-        } 
+        }
+        public async Task<List<double>?> GetPolicyByQueryId(string queryId)
+        {
+            return await _katagoServer.GetKatagoPolicy(queryId);
+        }
         
     }
 }
