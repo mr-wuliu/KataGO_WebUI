@@ -6,7 +6,7 @@ namespace WuliuGO.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class KatagoController : ControllerBase
+    public class KatagoController : Controller
     {
         private readonly IKatagoServer _katagoService;
 

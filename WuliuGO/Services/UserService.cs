@@ -31,7 +31,7 @@ namespace WuliuGO.Services
             var users = await _userRepository.GetAllUsersAsync();
             return users;
         }
-        public async void AddUserAsync(User user) {
+        public async Task AddUserAsync(User user) {
             await _userRepository.AddUserAsync(user);
         }
     }

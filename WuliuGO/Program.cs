@@ -55,7 +55,6 @@ builder.Services.AddSingleton(provider =>
 
 
 // Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -70,6 +69,8 @@ builder.Services.AddSession( options =>
     options.Cookie.IsEssential = true;
 }
 );
+// 添加视图
+builder.Services.AddControllersWithViews();
 
 // CORS
 builder.Services.AddCors(options =>
@@ -84,6 +85,7 @@ var app = builder.Build();
 
 // Timer 
 app.UseMiddleware<RequestTimingMiddleware>();
+app.UseStaticFiles();  // 确保启用静态文件支持
 
 app.UseSession();
 app.UseCors("AllowAllOrigins");

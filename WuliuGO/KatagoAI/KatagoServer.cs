@@ -39,7 +39,7 @@ namespace WuliuGO.Services
             return Task.CompletedTask;
         }
 
-        private async Task<string> InsertQuery(KatagoQuery katagoQuery)
+        private async Task<string> InsertQuery(Analysis katagoQuery)
         {
             // 长生命周期服务请求短生命周期服务需要使用scope获取服务
             using var scope = _serviceProvider.CreateScope();
@@ -113,8 +113,8 @@ namespace WuliuGO.Services
                         if (katagoQuery != null)
                         {
                             // update database
-                            katagoQuery.IsDuringSearch = result.IsDuringSearch;
-                            katagoQuery.MoveInfos = JsonConvert.SerializeObject(result.MoveInfos);
+                            katagoQuery.IsRunning = result.IsDuringSearch;
+                            katagoQuery.OutputMove = JsonConvert.SerializeObject(result.MoveInfos);
                             katagoQuery.RootInfo = JsonConvert.SerializeObject(result.RootInfo);
                             katagoQuery.TurnNumber = result.TurnNumber;
 
@@ -158,9 +158,9 @@ namespace WuliuGO.Services
             }
             // 创建数据库记录
             string queryId = await InsertQuery(
-                new KatagoQuery
+                new Analysis
                 {
-                    IsDuringSearch = true,
+                    IsRunning = true,
                 }
             );
 
@@ -198,9 +198,9 @@ namespace WuliuGO.Services
                 Id = result.QueryId
             };
 
-            if (result.MoveInfos != null)
+            if (result.OutputMove != null)
             {
-                katagoRest.Moves = JsonConvert.DeserializeObject<List<MoveInfo>>(result.MoveInfos)?.Take(4).ToList();
+                katagoRest.Moves = JsonConvert.DeserializeObject<List<MoveInfo>>(result.OutputMove)?.Take(4).ToList();
 
             }
             if (result.RootInfo != null)

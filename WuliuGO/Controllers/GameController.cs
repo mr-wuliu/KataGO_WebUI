@@ -8,7 +8,7 @@ namespace WuliuGO.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class GoGameController : ControllerBase
+    public class GoGameController : Controller
     {
         private readonly GoGameService _goGameService;
         private readonly UserService _userService;

@@ -6,7 +6,7 @@ namespace WuliuGO.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class UserController : ControllerBase
+    public class UserController : Controller
     {
         private readonly UserService _userService;
         public UserController(UserService userService)
@@ -33,13 +33,13 @@ namespace WuliuGO.Controllers
         }
 
         [HttpPost("add")]
-        public  IActionResult AddUser([FromBody] User user)
+        public  async Task<IActionResult> AddUser([FromBody] User user)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            _userService.AddUserAsync(user);
+            await _userService.AddUserAsync(user);
             return CreatedAtAction(nameof(GetUserById), new { id = user.Id }, user);
         }
 

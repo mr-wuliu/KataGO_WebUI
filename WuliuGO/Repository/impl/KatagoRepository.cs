@@ -8,28 +8,28 @@ public class KatagoRepository : IKatagoRepository
     {
         _context = context;
     }
-    public async Task AddKatagoQueryAsync(KatagoQuery katagoQuery)
+    public async Task AddKatagoQueryAsync(Analysis katagoQuery)
     {
-        await _context.KatagoQueries.AddAsync(katagoQuery);
+        await _context.AnalysisQuery.AddAsync(katagoQuery);
         await _context.SaveChangesAsync();
     }
 
     public async Task DeleteKatagoQueryByIdAsync(long id)
     {
-        var query = await _context.KatagoQueries.FindAsync(id);
+        var query = await _context.AnalysisQuery.FindAsync(id);
         if (query != null)
         {
-            _context.KatagoQueries.Remove(query);
+            _context.AnalysisQuery.Remove(query);
             await _context.SaveChangesAsync();
         }    }
 
-    public async Task<KatagoQuery?> GetKatagoQueryByQueryIdAsync(string queryId)
+    public async Task<Analysis?> GetKatagoQueryByQueryIdAsync(string queryId)
     {
-        return await _context.KatagoQueries.FirstOrDefaultAsync(q => q.QueryId == queryId);
+        return await _context.AnalysisQuery.FirstOrDefaultAsync(q => q.QueryId == queryId);
     }
 
-    public async Task UpdateKatagoQueryAsync(KatagoQuery katagoQuery)
+    public async Task UpdateKatagoQueryAsync(Analysis katagoQuery)
     {
-        _context.KatagoQueries.Update(katagoQuery);
+        _context.AnalysisQuery.Update(katagoQuery);
         await _context.SaveChangesAsync();    }
 }
