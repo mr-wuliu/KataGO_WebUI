@@ -78,13 +78,11 @@
     }
 
     .horizontal {
-        height: 1px;
         width: 540px;
         left: 15px;
     }
 
     .vertical {
-        width: 1px;
         height: 540px;
         top: 15px;
     }
@@ -112,14 +110,25 @@
         const container = document.getElementById('goban-container');
         const fetchPolicyButton = document.getElementById('fetchPolicyButton');
         const queryIdInput = document.getElementById('queryIdInput');
-        
+
         function resizeGoban() {
             const containerWidth = container.clientWidth;
             const containerHeight = container.clientHeight;
             const scale = Math.min(containerWidth / 570, containerHeight / 570);
             goban.style.transform = `scale(${scale})`;
         }
-
+        // 调整1px线条在高像素密度下的实际大小
+        function adjustLineThickness() {
+            const pixelRatio = window.devicePixelRatio || 1;
+            document.querySelectorAll('.horizontal').forEach(line => {
+                line.style.height = (1 / pixelRatio) + 'px';
+            });
+            document.querySelectorAll('.vertical').forEach(line => {
+                line.style.width = (1 / pixelRatio) + 'px';
+            });
+            // 调整棋盘边框厚度
+            goban.style.borderWidth = (2 / pixelRatio) + 'px';
+        }
         // 创建横线和竖线
         for (let i = 0; i < 19; i++) {
             const hline = document.createElement('div');
@@ -197,6 +206,8 @@
         });
 
         resizeGoban();
+        adjustLineThickness();  // 调整1px线条的厚度
         window.addEventListener('resize', resizeGoban);
+        window.addEventListener('resize', adjustLineThickness);
     });
 </script>
